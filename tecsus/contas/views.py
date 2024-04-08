@@ -1,5 +1,4 @@
 import csv
-from django.shortcuts import render
 from .forms import CSVUploadForm
 from .models import Agua, Energia, Gas
 from rest_framework.response import Response
@@ -41,3 +40,10 @@ class UploadCSVView(APIView):
             return Gas
         else:
             return None
+        
+
+class AguaListView(APIView):
+    def get(self, request):
+        aguas = Agua.objects.all()
+        data = [{'id': agua.id, 'dados': agua.dados, 'data_envio': agua.data_envio} for agua in aguas]
+        return Response(data)
