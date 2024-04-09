@@ -41,3 +41,4 @@ class UploadCSVView(APIView):
             return Gas
         else:
             return None
+
