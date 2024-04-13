@@ -6,6 +6,10 @@ docker-compose build
 
 REM Aplicar migrações do Django
 echo Aplicando migrações do Django...
+docker-compose run web python manage.py makemigrate
+
+REM Aplicar migrações do Django
+echo Aplicando migrações do Django...
 docker-compose run web python manage.py migrate
 
 REM Criar superusuário

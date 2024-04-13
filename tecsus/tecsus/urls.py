@@ -16,8 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from .view import UploadCSVView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/contas/', include('contas.urls')), 
+    path('upload/<str:model>/<str:documento>/', UploadCSVView.as_view(), name='upload_csv_teste'),
+    path('api/energia/', include('energia.urls')), 
+    path('api/agua/', include('agua.urls')), 
 ]
