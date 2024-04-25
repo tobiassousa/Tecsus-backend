@@ -45,7 +45,7 @@ from .models import ContratoEnergia, ProEnergia
 def consulta_contrato_pro_energia(request):
     resultados = ContratoEnergia.objects.raw('''
         SELECT tce.id_contrato_energia, tce.fornecedor, tce.num_instalacao, tce.num_medidor,
-               tce.num_cliente, tce.modalidade, tce.forma_pagto, pe.id_pro_energia,
+               tce.num_cliente, tce.modalidade, tce.forma_pagto, tce.cidade, pe.id_pro_energia,
                pe.leitura_anterior, pe.leitura_atual, pe.demanda_faturada_kw, pe.total,
                pe.fornecedor, pe.num_instalacao, pe.num_cliente, pe.modalidade,
                pe.num_contrato
@@ -64,6 +64,7 @@ def consulta_contrato_pro_energia(request):
             'num_cliente_contrato': resultado.num_cliente,
             'modalidade_contrato': resultado.modalidade,
             'forma_pagto_contrato': resultado.forma_pagto,
+            'cidade': resultado.cidade,
             'id_pro_energia': resultado.id_pro_energia,
             'leitura_anterior_energia': resultado.leitura_anterior,
             'leitura_atual_energia': resultado.leitura_atual,
