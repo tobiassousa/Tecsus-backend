@@ -5,6 +5,10 @@ from energia.models import ContratoEnergia, ProEnergia
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from decouple import config
 
 class UploadCSVView(APIView):
     permission_classes = [AllowAny]
@@ -108,7 +112,24 @@ class UploadCSVView(APIView):
                 return field_mapping_agua_pro.get(csv_header, None)
         return None
 
-    
 
 
+class EnviarEmailView(APIView):
+    permission_classes = [AllowAny]
 
+    def post(self, request, email):
+        assunto = request.data.get('assunto')
+        contexto = request.data.get('contexto', {})
+
+        corpo_email_html = render_to_string('email/envio_email.html', contexto)
+
+        corpo_email_texto = strip_tags(corpo_email_html)
+
+        send_mail(
+            subject=assunto,
+            message=corpo_email_texto,
+            html_message=corpo_email_html,
+            from_email= config('EMAIL', default=''),
+            recipient_list=[email],
+        )
+        return Response({'status': 'E-mail enviado com sucesso'})

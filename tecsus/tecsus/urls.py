@@ -16,11 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .view import UploadCSVView
+from .view import UploadCSVView, EnviarEmailView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('upload/<str:model>/<str:documento>/', UploadCSVView.as_view(), name='upload_csv_teste'),
     path('api/energia/', include('energia.urls')), 
     path('api/agua/', include('agua.urls')), 
+    path('enviar-email/<str:email>/', EnviarEmailView.as_view(), name='enviar_email'),
 ]
