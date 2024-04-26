@@ -24,9 +24,10 @@ jobs:
           python-version: 3.x
 
       - name: Install env
-        run: |
-          python3 -m venv venv
-          . ./tecsus/venv/Scripts/activate
+        run: python3 -m venv venv
+
+      - name: Activate env
+        run: . ./tecsus/venv/Scripts/activate
 
       - name: Run tests
         run: pytest
