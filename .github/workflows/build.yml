@@ -35,3 +35,40 @@ jobs:
 
       - name: Push Docker Image
         run: docker push user/python-app
+
+name: Build Application
+
+on: 
+  push:
+    branches: 
+      - xp-35-build
+  pull_request: 
+    branches: 
+      - xp-35-build
+    types:
+      - closed
+
+jobs: 
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: Run tests
+        run: pytest
+
+      - name: Login to Docker Hub
+        run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_ACCESS_TOKEN}}
+
+      - name: Build Docker Image
+        run: docker build -t user/python-app .
+
+      - name: Push Docker Image
+        run: docker push user/python-app
