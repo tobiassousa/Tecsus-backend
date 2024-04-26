@@ -26,7 +26,7 @@ jobs:
       - name: Install env
         run: |
           python3 -m venv venv
-          .\tecsus\venv\Scripts\activate
+          . ./tecsus/venv/Scripts/activate
 
       - name: Run tests
         run: pytest
