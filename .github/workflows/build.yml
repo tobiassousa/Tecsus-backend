@@ -24,7 +24,9 @@ jobs:
           python-version: 3.x
 
       - name: Run tests
-        run: pytest
+        run: |
+          source venv/bin/activate
+          pytest
         working-directory: tecsus
 
       - name: Login to Docker Hub
