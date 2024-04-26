@@ -118,7 +118,7 @@ class EnviarEmailView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request, email):
-        assunto = request.data.get('assunto')
+        assunto = "Alerta"
         contexto = request.data.get('contexto', {})
 
         corpo_email_html = render_to_string('email/envio_email.html', contexto)
