@@ -24,7 +24,7 @@ jobs:
           python-version: 3.x
 
       - name: Run tests
-        run: .\venv\Scripts\activate ; pytest
+        run: ./venv/Scripts/activate ; pytest
 
       - name: Login to Docker Hub
         run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_ACCESS_TOKEN}}
