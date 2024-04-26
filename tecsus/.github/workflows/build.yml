@@ -3,10 +3,10 @@ name: Build Application
 on: 
   push:
     branches: 
-      - main
+      - xp-35-build
   pull_request: 
     branches: 
-      - main
+      - xp-35-build
 
 jobs: 
   build:
