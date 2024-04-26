@@ -26,10 +26,6 @@ jobs:
       - name: Install env
         run: python3 -m venv venv
 
-      - name: Activate env
-        run: . venv/Scripts/activate
-        working-directory: tecsus
-
       - name: Run tests
         run: pytest
         working-directory: tecsus
