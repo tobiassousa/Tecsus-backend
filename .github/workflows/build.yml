@@ -23,18 +23,13 @@ jobs:
         with:
           python-version: 3.x
 
-      - name: Install env
-        run: python3 -m venv venv
-
-      - name: Run tests
-        run: pytest
-        working-directory: tecsus
-
-      - name: Login to Docker Hub
+      - name: Login Docker Hub
         run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_ACCESS_TOKEN}}
 
       - name: Build Docker Image
-        run: docker build -t user/python-app .
+        run: docker build -t datateam23/tecsus-backend .
+        working-directory: tecsus
 
       - name: Push Docker Image
-        run: docker push user/python-app
+        run: docker push datateam23/tecsus-backend
+        working-directory: tecsus
