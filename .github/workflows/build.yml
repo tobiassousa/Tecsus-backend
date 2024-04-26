@@ -25,7 +25,7 @@ jobs:
 
       - name: Run tests
         run: |
-          source tecsus/venv/bin/activate
+          . tecsus/venv/Script/activate
           pytest
         working-directory: tecsus
 
