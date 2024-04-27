@@ -59,7 +59,7 @@ class UploadCSVView(APIView):
         field_mapping_energia_pro = {
             'Leitura Anterior': 'leitura_anterior',
             'Leitura Atual': 'leitura_atual',
-            'Demanda Faturada (KW)': 'demanda_faturada_kw',
+            'Demanda Faturada (kW)': 'demanda_faturada_kw',
             'Total': 'total',
             'Fornecedor': 'fornecedor',
             'Número Instalação': 'num_instalacao',
