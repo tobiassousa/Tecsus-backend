@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+
+from alerta.views import AlertaAguaAPIView
 from .view import UploadCSVView
 
 urlpatterns = [
@@ -23,4 +25,5 @@ urlpatterns = [
     path('upload/<str:model>/<str:documento>/', UploadCSVView.as_view(), name='upload_csv_teste'),
     path('api/energia/', include('energia.urls')), 
     path('api/agua/', include('agua.urls')), 
+    path('api/alerta/', include('alerta.urls'))
 ]
