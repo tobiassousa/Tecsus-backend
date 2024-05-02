@@ -7,15 +7,9 @@ from .models import AlertaAgua
 
 class AlertaAguaAPIView(APIView):
     def get(self, request):
-        alerta_agua = AlertaAgua.objects.all()
-        data = [{'id_alerta': alerta_agua.id_alerta,
-                 'id_user_alerta': alerta_agua.id_user_alerta,
-                 'alert_user_email': alerta_agua.alert_user_email,
-                 'alert_consumo_media': alerta_agua.alert_consumo_media,
-                 'alert_consumo_atual': alerta_agua.alert_consumo_atual,
-                 'alert_conta': alerta_agua.alert_conta,
-                }]
-        return Response(data) 
+        alertas = AlertaAgua.objects.all()
+        serializer = AlertaAguaSerializer(alertas, many=True)
+        return Response(serializer.data)
     
     def post(self, request):
         serializer = AlertaAguaSerializer(data = request.data)
