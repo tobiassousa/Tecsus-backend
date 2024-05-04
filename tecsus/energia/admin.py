@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import ContratoEnergia, ProEnergia
+from .models import AlertaEnergia, ContratoEnergia, ProEnergia
 
 @admin.register(ContratoEnergia)
 class AguaAdmin(admin.ModelAdmin):
@@ -9,3 +9,7 @@ class AguaAdmin(admin.ModelAdmin):
 @admin.register(ProEnergia)
 class AguaAdmin(admin.ModelAdmin):
     list_display = [field.name for field in ProEnergia._meta.fields]
+    
+@admin.register(AlertaEnergia)
+class AlertaEnergiaAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in AlertaEnergia._meta.fields]

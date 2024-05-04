@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import AlertaAgua
 
 class AlertaAguaSerializer(serializers.ModelSerializer):
