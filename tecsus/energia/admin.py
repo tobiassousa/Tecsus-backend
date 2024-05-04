@@ -9,3 +9,4 @@ class AguaAdmin(admin.ModelAdmin):
 @admin.register(ProEnergia)
 class AguaAdmin(admin.ModelAdmin):
     list_display = [field.name for field in ProEnergia._meta.fields]
+    list_filter = ["num_cliente", "num_contrato"]
