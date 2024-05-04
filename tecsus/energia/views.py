@@ -1,6 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import ContratoEnergia, ProEnergia
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from .models import ContratoEnergia, ProEnergia
+from .utils import calcular_media_ultimos_tres_meses
 
 class ContratoEnergiaAPIView(APIView):
     def get(self, request):
@@ -35,11 +39,6 @@ class ProEnergiaAPIView(APIView):
                  'data_extra': pro.data_extra} for pro in pro_energias]
         return Response(data)
 
-
-
-from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
-from .models import ContratoEnergia, ProEnergia
 
 @require_http_methods(["GET"])
 def consulta_contrato_pro_energia(request):
@@ -79,4 +78,10 @@ def consulta_contrato_pro_energia(request):
 
     return JsonResponse(data, safe=False)
 
-    
+class MediaConsumoUltimosTresMesesAPIView(APIView):
+    def get(self, request, num_cliente):
+        resultado = calcular_media_ultimos_tres_meses(num_cliente)
+        if resultado is not None:
+            return Response({'resultado': resultado})
+        else:
+            return Response({'mensagem': 'Nenhum registro encontrado nos últimos três meses.'}, status=404)

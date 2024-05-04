@@ -25,5 +25,3 @@ class ProEnergia(models.Model):
     modalidade = models.CharField(max_length=10000)
     num_contrato = models.CharField(max_length=10000)
     data_extra = models.JSONField()
-
-
