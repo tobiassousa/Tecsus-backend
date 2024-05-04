@@ -2,7 +2,7 @@
   "version": "4.0",
   "datasetReference": {
     "byPath": {
-      "path": "../API Tecsus (1).SemanticModel"
+      "path": "../API Tecsus.SemanticModel"
     },
     "byConnection": null
   }
