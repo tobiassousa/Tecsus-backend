@@ -6,7 +6,7 @@ docker-compose build
 
 REM Aplicar migrações do Django
 echo Aplicando migrações do Django...
-docker-compose run web python manage.py makemigrate
+docker-compose run web python manage.py makemigrations
 
 REM Aplicar migrações do Django
 echo Aplicando migrações do Django...
