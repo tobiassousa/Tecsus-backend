@@ -7,7 +7,8 @@ def corrigir_e_converter(valor_str):
     try:
         return float(valor_str)
     except ValueError:
-        return None
+        return 0.0
+
 
 def calcular_media_ultimos_tres_meses(num_cliente):
     data_tres_meses_atras = datetime.now() - timedelta(days=90)

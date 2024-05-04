@@ -78,10 +78,41 @@ def consulta_contrato_pro_energia(request):
 
     return JsonResponse(data, safe=False)
 
+from django.db.models import Sum
+from datetime import datetime, timedelta
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from .utils import calcular_media_ultimos_tres_meses, corrigir_e_converter
+from .models import ProEnergia
+
 class MediaConsumoUltimosTresMesesAPIView(APIView):
     def get(self, request, num_cliente):
-        resultado = calcular_media_ultimos_tres_meses(num_cliente)
-        if resultado is not None:
-            return Response({'resultado': resultado})
+        resultado_media_tres_meses = calcular_media_ultimos_tres_meses(num_cliente)
+        
+        # Calcular a média do consumo do mês atual
+        hoje = datetime.now()
+        primeiro_dia_mes_atual = hoje.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        registros_mes_atual = ProEnergia.objects.filter(
+            num_cliente=num_cliente,
+            leitura_atual__gte=primeiro_dia_mes_atual,
+            total__isnull=False  # Excluir registros com total inválido
+        )
+        valores_corrigidos = [corrigir_e_converter(registro.total) for registro in registros_mes_atual]
+        consumo_mes_atual = sum(valores_corrigidos)
+        media_mes_atual = consumo_mes_atual / len(valores_corrigidos) if valores_corrigidos else None
+
+        if resultado_media_tres_meses is not None and media_mes_atual is not None:
+            if media_mes_atual > resultado_media_tres_meses:
+                mensagem = 'O consumo do mês atual está acima da média dos últimos três meses.'
+            elif media_mes_atual < resultado_media_tres_meses:
+                mensagem = 'O consumo do mês atual está abaixo da média dos últimos três meses.'
+            else:
+                mensagem = 'O consumo do mês atual está na média dos últimos três meses.'
+                
+            return Response({
+                'media_tres_meses': resultado_media_tres_meses,
+                'media_mes_atual': media_mes_atual,
+                'mensagem': mensagem
+            })
         else:
-            return Response({'mensagem': 'Nenhum registro encontrado nos últimos três meses.'}, status=404)
+            return Response({'mensagem': 'Nenhum registro encontrado ou média indisponível.'}, status=404)
