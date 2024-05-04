@@ -129,7 +129,7 @@ class EnviarEmailView(APIView):
             subject=assunto,
             message=corpo_email_texto,
             html_message=corpo_email_html,
-            from_email= config('EMAIL', default=''),
+            from_email= config('EMAIL_HOST_USER', default=''),
             recipient_list=[email],
         )
         return Response({'status': 'E-mail enviado com sucesso'})

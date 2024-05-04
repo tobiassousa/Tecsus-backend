@@ -7,8 +7,3 @@ class AlertaAgua(models.Model):
     alert_consumo_media = models.CharField(max_length=1000)
     alert_consumo_atual = models.CharField(max_length=1000)
     alert_conta = models.CharField(max_length=10000)
-
-    
-    
-    
-    

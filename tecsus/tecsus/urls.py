@@ -25,6 +25,6 @@ urlpatterns = [
     path('upload/<str:model>/<str:documento>/', UploadCSVView.as_view(), name='upload_csv_teste'),
     path('api/energia/', include('energia.urls')), 
     path('api/agua/', include('agua.urls')), 
-    path('api/alerta/', include('alerta.urls'))
+    path('api/alerta/', include('alerta.urls')),
     path('enviar-email/<str:email>/', EnviarEmailView.as_view(), name='enviar_email'),
 ]

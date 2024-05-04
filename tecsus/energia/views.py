@@ -78,10 +78,17 @@ def consulta_contrato_pro_energia(request):
 
     return JsonResponse(data, safe=False)
 
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .utils import calcular_media_ultimos_tres_meses, verificar_consumo_mes_anterior
+
 class MediaConsumoUltimosTresMesesAPIView(APIView):
     def get(self, request, num_cliente):
-        resultado = calcular_media_ultimos_tres_meses(num_cliente)
-        if resultado is not None:
-            return Response({'resultado': resultado})
+        resultado_media = calcular_media_ultimos_tres_meses(num_cliente)
+        resultado_verificacao = verificar_consumo_mes_anterior(num_cliente)
+        
+        if resultado_media is not None:
+            return Response({'resultado_media': resultado_media, 'verificacao_consumo_mes_anterior': resultado_verificacao})
         else:
             return Response({'mensagem': 'Nenhum registro encontrado nos últimos três meses.'}, status=404)
