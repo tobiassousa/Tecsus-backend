@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from .models import ProEnergia
+from .models import ProAgua
 
 def corrigir_e_converter(valor_str):
     valor_str = valor_str.strip().replace('.', '').replace(',', '.')
@@ -11,14 +11,14 @@ def corrigir_e_converter(valor_str):
 def calcular_media_ultimos_tres_meses(num_cliente):
     data_tres_meses_atras = datetime.now() - timedelta(days=90)
 
-    registros = ProEnergia.objects.filter(
+    registros = ProAgua.objects.filter(
         num_cliente=num_cliente,
         leitura_atual__gte=data_tres_meses_atras
     )
 
     valores_corrigidos = []
     for registro in registros:
-        valor_corrigido = corrigir_e_converter(registro.total)
+        valor_corrigido = corrigir_e_converter(registro.vlw_total)
         if valor_corrigido is not None:
             valores_corrigidos.append(valor_corrigido)
 
@@ -45,7 +45,7 @@ def verificar_consumo_mes_anterior(num_cliente):
 
     valores_corrigidos = []
     for registro in registros_mes_anterior:
-        valor_corrigido = corrigir_e_converter(registro.total)
+        valor_corrigido = corrigir_e_converter(registro.vlw_total)
         if valor_corrigido is not None:
             valores_corrigidos.append(valor_corrigido)
 
