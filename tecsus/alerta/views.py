@@ -1,21 +1,15 @@
 from rest_framework import status
-from alerta.serializer import AlertaAguaSerializer
+from alerta.serializer import AlertaAguaSerializer, AlertaEnergiaSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import AlertaAgua
+from .models import AlertaAgua, AlertaEnergia
 
 
 class AlertaAguaAPIView(APIView):
     def get(self, request):
         alerta_agua = AlertaAgua.objects.all()
-        data = [{'id_alerta': alerta_agua.id_alerta,
-                 'id_user_alerta': alerta_agua.id_user_alerta,
-                 'alert_user_email': alerta_agua.alert_user_email,
-                 'alert_consumo_media': alerta_agua.alert_consumo_media,
-                 'alert_consumo_atual': alerta_agua.alert_consumo_atual,
-                 'alert_conta': alerta_agua.alert_conta,
-                }]
-        return Response(data) 
+        serializer = AlertaAguaSerializer(alerta_agua, many=True)
+        return Response(serializer.data)
     
     def post(self, request):
         serializer = AlertaAguaSerializer(data = request.data)
@@ -24,4 +18,17 @@ class AlertaAguaAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+class AlertaEnergiaAPIVIew(APIView):
+    def get(self, request):
+        alerta_agua = AlertaEnergia.objects.all()
+        serializer = AlertaEnergiaSerializer(alerta_agua, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        serializer = AlertaAguaSerializer(data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         

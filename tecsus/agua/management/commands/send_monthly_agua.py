@@ -19,7 +19,7 @@ class Command(BaseCommand):
             if resultado_verificacao:
                 media_tres_meses = calcular_media_ultimos_tres_meses(num_cliente)
                 if media_tres_meses is not None:
-                    if "maior que a média" in resultado_verificacao:
+                    # if "maior que a média" in resultado_verificacao:
                         self.salvar_alerta(num_cliente, media_tres_meses, resultado_verificacao)
                         self.enviar_email(num_cliente,  media_tres_meses, resultado_verificacao)
 
@@ -39,7 +39,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Alerta salvo para o cliente {}.'.format(num_cliente)))
 
     def enviar_email(self, num_cliente, media_tres_meses, resultado_verificacao):
-        assunto = "Alerta de Consumo Energético"
+        assunto = "Alerta de Consumo de Água"
         contexto = {
             'num_cliente': num_cliente,
             'media_tres_meses': "R$ " + "{:.2f}".format(media_tres_meses) if media_tres_meses is not None else None,

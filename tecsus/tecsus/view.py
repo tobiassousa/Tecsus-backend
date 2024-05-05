@@ -58,6 +58,9 @@ class UploadCSVView(APIView):
             'Forma de Pagamento': 'forma_pagto',
             'Campo Extra de Acesso 1': 'email_energia',
             'Nome do Contrato': 'cidade',
+            'Horário de Ponta': 'hor_ponta',
+            'Demanda Ponta': 'dem_ponta',
+            'Demanda Fora Ponta': 'dem_fora_ponta'
         }
 
         field_mapping_energia_pro = {
@@ -70,6 +73,8 @@ class UploadCSVView(APIView):
             'Número Cliente': 'num_cliente',
             'Modalidade': 'modalidade',
             'Número Contrato': 'num_contrato',
+            'Benefício Tarifário Bruto': 'ben_tar_bruto',
+            'Benefício Tarifário Líquido': 'ben_tar_liq'
         }
 
         field_mapping_agua_contrato = {
