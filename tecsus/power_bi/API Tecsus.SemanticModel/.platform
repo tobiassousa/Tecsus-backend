@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "API Tecsus (1)"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "0585329a-09b1-437f-b1f3-abf9679c8fa5"
+  }
+}
