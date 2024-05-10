@@ -74,7 +74,14 @@ class UploadCSVView(APIView):
             'Modalidade': 'modalidade',
             'Número Contrato': 'num_contrato',
             'Benefício Tarifário Bruto': 'ben_tar_bruto',
-            'Benefício Tarifário Líquido': 'ben_tar_liq'
+            'Benefício Tarifário Líquido': 'ben_tar_liq',
+            'Consumo PT VD': 'con_pt_vd',
+            'Consumo FP CAP VD': 'con_fp_cad',
+            'Consumo FP IND VD': 'con_fp_ind',
+            'Demanda PT (kW)': 'dem_pt',
+            'Demanda FP CAP (kW)': 'dem_fp_cad',
+            'Demanda FP IND (kW)': 'dem_fp_ind',
+            'grupo': 'grupos'
         }
 
         field_mapping_agua_contrato = {

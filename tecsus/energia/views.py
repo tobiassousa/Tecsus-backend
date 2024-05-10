@@ -48,7 +48,8 @@ def consulta_contrato_pro_energia(request):
                tce.dem_ponta, tce.dem_fora_ponta, pe.id_pro_energia,
                pe.leitura_anterior, pe.leitura_atual, pe.demanda_faturada_kw, pe.total,
                pe.fornecedor, pe.num_instalacao, pe.num_cliente, pe.modalidade,
-               pe.num_contrato, pe.ben_tar_bruto, pe.ben_tar_liq
+               pe.num_contrato, pe.ben_tar_bruto, pe.ben_tar_liq, pe.grupos, pe.con_pt_vd, pe.con_fp_cad,
+               pe.con_fp_ind, pe.dem_fp_cad, pe.dem_pt, pe.dem_fp_ind
         FROM energia_contratoenergia tce
         INNER JOIN energia_proenergia pe ON pe.num_instalacao = tce.num_instalacao
         WHERE pe.num_contrato <> ''
@@ -79,7 +80,14 @@ def consulta_contrato_pro_energia(request):
             'modalidade_energia': resultado.modalidade,
             'num_contrato_energia': resultado.num_contrato,
             'ben_tar_bruto': resultado.ben_tar_bruto,
-            'ben_tar_liq': resultado.ben_tar_liq
+            'ben_tar_liq': resultado.ben_tar_liq,
+            'Consumo PT VD': resultado.con_pt_vd,
+            'Consumo FP CAP VD': resultado.con_fp_cad,
+            'Consumo FP IND VD': resultado.con_fp_ind,
+            'Demanda PT (kW)': resultado.dem_pt,
+            'Demanda FP CAP (kW)': resultado.dem_fp_cad,
+            'Demanda FP IND (kW)': resultado.dem_fp_ind,
+            'Grupo': resultado.grupos,
         })
 
     return JsonResponse(data, safe=False)

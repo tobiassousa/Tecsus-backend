@@ -2,9 +2,10 @@ from datetime import datetime, timedelta
 from .models import ProEnergia
 
 def corrigir_e_converter(valor_str):
-    valor_str = valor_str.strip().replace('.', '').replace(',', '.')
+    valor_sem_virgula = valor_str.split(".")[0]
+    valor_sem_pontos = valor_sem_virgula.replace(",", "").strip()
     try:
-        return float(valor_str)
+        return float(valor_sem_pontos)
     except ValueError:
         return 0.0
 
@@ -27,38 +28,41 @@ def calcular_media_ultimos_tres_meses(num_cliente):
         return media
     else:
         return None
+    
 
 def verificar_consumo_mes_anterior(num_cliente):
-    mes_atual = datetime.now().month
-    ano_atual = datetime.now().year
-
-    mes_anterior = mes_atual - 1 if mes_atual > 1 else 12
-    ano_anterior = ano_atual if mes_atual > 1 else ano_atual - 1
-
-    data_mes_anterior = datetime(ano_anterior, mes_anterior, 1)
-    data_inicio_mes_atual = datetime(ano_atual, mes_atual, 1)
-    registros_mes_anterior = ProEnergia.objects.filter(
+    registros = ProEnergia.objects.filter(
         num_cliente=num_cliente,
-        leitura_atual__gte=data_mes_anterior,
-        leitura_atual__lt=data_inicio_mes_atual
+        leitura_atual__gte="08/05/2024", 
+        leitura_atual__lte="30/05/2024"
     )
 
     valores_corrigidos = []
-    for registro in registros_mes_anterior:
+    for registro in registros:
         valor_corrigido = corrigir_e_converter(registro.total)
         if valor_corrigido is not None:
             valores_corrigidos.append(valor_corrigido)
 
     if valores_corrigidos:
-        consumo_mes_anterior = sum(valores_corrigidos)
-        media_ultimos_tres_meses = calcular_media_ultimos_tres_meses(num_cliente)
-        if media_ultimos_tres_meses is not None:
-            if consumo_mes_anterior > media_ultimos_tres_meses:
-                return f"O consumo do mês anterior ({datetime.strftime(data_mes_anterior, '%B')}) foi maior que a média dos últimos três meses."
-            else:
-                return f"O consumo do mês anterior ({datetime.strftime(data_mes_anterior, '%B')}) foi menor ou igual à média dos últimos três meses."
-        else:
-            return "Não foi possível calcular a média dos últimos três meses."
+        media = sum(valores_corrigidos) / len(valores_corrigidos)
+        return media
     else:
-        return "Não há registros para o mês anterior."
+        return None
+    
+
+def comparar_consumo_mes_atual_e_anterior(num_cliente):
+    media_mes_atual = calcular_media_ultimos_tres_meses(num_cliente)
+    media_mes_anterior = verificar_consumo_mes_anterior(num_cliente)
+
+    if media_mes_atual is not None and media_mes_anterior is not None:
+        if media_mes_atual > media_mes_anterior:
+            return "O consumo deste mês é maior do que o consumo do mês anterior."
+        elif media_mes_atual < media_mes_anterior:
+            return "O consumo deste mês é menor do que o consumo do mês anterior."
+        else:
+            return "O consumo deste mês é igual ao consumo do mês anterior."
+    else:
+        return "Não foi possível comparar os consumos."
+    
+
 

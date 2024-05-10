@@ -29,4 +29,12 @@ class ProEnergia(models.Model):
     num_contrato = models.CharField(max_length=10000)
     ben_tar_bruto = models.CharField(max_length=10000)
     ben_tar_liq = models.CharField(max_length=10000)
+    con_pt_vd = models.CharField(max_length=1000, default='')
+    con_fp_cad = models.CharField(max_length=1000,  default='')
+    con_fp_ind = models.CharField(max_length=1000, default='')
+    dem_fp_cad = models.CharField(max_length=1000, default='' )
+    dem_pt = models.CharField(max_length=1000, default='' )
+    dem_fp_ind = models.CharField(max_length=1000, default='' )
+    grupos = models.CharField(max_length=1000, default='' )
     data_extra = models.JSONField()
+    

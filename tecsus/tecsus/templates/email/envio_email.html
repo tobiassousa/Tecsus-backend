@@ -38,8 +38,8 @@
     <div class="container">
         <h1>Alerta de Consumo de Energia</h1>
         <p>Olá,</p>
-        <p>Desculpe informar que seu consumo de energia ultrapassou a média dos últimos três meses {% if media_tres_meses %}{{ media_tres_meses }}{% else %}N/A{% endif %}. Isso pode indicar um comportamento de consumo excessivo que precisa ser avaliado e corrigido para garantir uma utilização mais eficiente.</p>
-        <p>A média atual do consumo é: {% if resultado_verificacao %}{{ resultado_verificacao }}{% else %}N/A{% endif %}</p>
+        <p>Desculpe informar que seu consumo de energia ultrapassou a média dos últimos três meses {% if resultado_verificacao %}{{ resultado_verificacao }}{% else %}N/A{% endif %} . Isso pode indicar um comportamento de consumo excessivo que precisa ser avaliado e corrigido para garantir uma utilização mais eficiente.</p>
+        <p>A média atual do consumo é: {% if media_tres_meses %}{{ media_tres_meses }}{% else %}N/A{% endif %}</p>
         <p>Por favor, tome medidas para reduzir seu consumo de energia e entre em contato conosco se precisar de alguma assistência adicional.</p>
         <p>Atenciosamente,<br/>Tecsus</p>
     </div>
