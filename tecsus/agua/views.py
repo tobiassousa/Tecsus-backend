@@ -1,10 +1,52 @@
+import csv
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import FornecedorAgua, Endereco, ClienteContrato, FatoContratoAgua
-import csv
 from datetime import datetime
 from django.core.files.storage import default_storage
+from rest_framework import generics
+from .serializers import FornecedorAguaSerializer, EnderecoSerializer, ClienteContratoSerializer, FatoContratoAguaSerializer
+
+
+class FornecedorAguaAPIView(generics.ListAPIView):
+    queryset = FornecedorAgua.objects.all()
+    serializer_class = FornecedorAguaSerializer
+
+
+class EnderecoAPIView(generics.ListAPIView):
+    queryset = Endereco.objects.all()
+    serializer_class = EnderecoSerializer
+
+
+class ClienteContratoAPIView(generics.ListAPIView):
+    queryset = ClienteContrato.objects.all()
+    serializer_class = ClienteContratoSerializer
+
+
+class FatoContratoAguaAPIView(generics.ListAPIView):
+    queryset = FatoContratoAgua.objects.all()
+    serializer_class = FatoContratoAguaSerializer
+
+
+class AllDataAPIView(APIView):
+    def get(self, request, format=None):
+        fornecedores = FornecedorAgua.objects.all()
+        enderecos = Endereco.objects.all()
+        contratos = ClienteContrato.objects.all()
+        fatos_contratos = FatoContratoAgua.objects.all()
+
+        fornecedores_data = FornecedorAguaSerializer(fornecedores, many=True).data
+        enderecos_data = EnderecoSerializer(enderecos, many=True).data
+        contratos_data = ClienteContratoSerializer(contratos, many=True).data
+        fatos_contratos_data = FatoContratoAguaSerializer(fatos_contratos, many=True).data
+
+        return Response({
+            'fornecedores': fornecedores_data,
+            'enderecos': enderecos_data,
+            'contratos': contratos_data,
+            'fatos_contratos': fatos_contratos_data,
+        })
 
 
 class InserirDadosAPIView(APIView):
