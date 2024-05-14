@@ -7,6 +7,7 @@ from datetime import datetime
 from django.core.files.storage import default_storage
 from rest_framework import generics
 from .serializers import FornecedorAguaSerializer, EnderecoSerializer, ClienteContratoSerializer, FatoContratoAguaSerializer
+from .utils import comparar_media_mes_atual_com_ultimos_tres_meses
 
 
 class FornecedorAguaAPIView(generics.ListAPIView):
@@ -152,3 +153,12 @@ class InserirDadosAPIView(APIView):
                 return datetime.strptime(data_str, '%d/%m/%Y')
         except ValueError:
             return None
+        
+
+class CompareMesAtualComTresUltimosMeses(APIView):
+    def get(self, request, codigo_de_ligacao_rgi):
+        try:
+            comparison_result = comparar_media_mes_atual_com_ultimos_tres_meses(codigo_de_ligacao_rgi)
+            return Response({"message": comparison_result}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
