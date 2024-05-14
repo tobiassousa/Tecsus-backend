@@ -1,97 +1,112 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import ContratoAgua, ProAgua
-from django.db.models import F
-from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
-from .models import ContratoAgua, ProAgua
-
-class ContratoAguaAPIView(APIView):
-    def get(self, request):
-        contratos_agua = ContratoAgua.objects.all()
-        data = [{'id': contrato.id_contrato_agua,
-                 'fornecedor': contrato.fornecedor,
-                 'num_instalacao': contrato.num_instalacao,
-                 'num_medidor': contrato.num_medidor,
-                 'num_cliente': contrato.num_cliente,
-                 'modalidade': contrato.modalidade,
-                 'num_contrato': contrato.num_contrato,
-                 'tipo_pagto': contrato.tipo_pagto,
-                 'email_agua': contrato.email_agua,
-                 'cidade': contrato.cidade,
-                 'cod_ligacao_rgi': contrato.cod_ligacao_rgi,
-                 'data_extra': contrato.data_extra} for contrato in contratos_agua]
-        return Response(data)
-
-class ProAguaAPIView(APIView):
-    def get(self, request):
-        pros_agua = ProAgua.objects.all()
-        data = [{'id': pro.id_pro_agua,
-                 'leitura_anterior': pro.leitura_anterior,
-                 'leitura_atual': pro.leitura_atual,
-                 'consumo_agua_m3': pro.consumo_agua_m3,
-                 'consumo_esgoto_m3': pro.consumo_esgoto_m3,
-                 'vlr_agua': pro.vlr_agua,
-                 'vlr_esgoto': pro.vlr_esgoto,
-                 'vlr_total': pro.vlr_total,
-                 'num_instalacao': pro.num_instalacao,
-                 'num_medidor': pro.num_medidor,
-                 'num_cliente': pro.num_cliente,
-                 'cod_ligacao_rgi': pro.cod_ligacao_rgi,
-                 'num_contrato': pro.num_contrato,
-                 'data_extra': pro.data_extra} for pro in pros_agua]
-        return Response(data)
+from rest_framework import status
+from .models import FornecedorAgua, Endereco, ClienteContrato, FatoContratoAgua
+import csv
+from datetime import datetime
+from django.core.files.storage import default_storage
 
 
-@require_http_methods(["GET"])
-def consulta_contrato_pro_agua(request):
-    resultados = ContratoAgua.objects.raw('''
-        SELECT ct.id_contrato_agua, ct.fornecedor, ct.num_instalacao, ct.num_medidor, ct.num_cliente,
-               ct.modalidade, ct.num_contrato, ct.tipo_pagto, ct.email_agua,
-               ct.cidade, ct.cod_ligacao_rgi, pr.id_pro_agua, pr.leitura_anterior, pr.leitura_atual,
-               pr.consumo_agua_m3, pr.consumo_esgoto_m3, pr.vlr_agua, pr.vlr_esgoto,
-               pr.vlr_total, pr.num_instalacao, pr.num_medidor, pr.num_cliente,
-               pr.cod_ligacao_rgi, pr.num_contrato
-        FROM agua_contratoagua ct
-        INNER JOIN agua_proagua pr ON pr.cod_ligacao_rgi = ct.cod_ligacao_rgi
-    ''')
+class InserirDadosAPIView(APIView):
+    def post(self, request):
+        tipo_documento = request.data.get('tipo_documento')
+        arquivo_csv = request.FILES.get('arquivo_csv')
 
-    data = []
-    for resultado in resultados:
-        data.append({
-            'id_contrato_agua': resultado.id_contrato_agua,
-            'fornecedor': resultado.fornecedor,
-            'num_instalacao': resultado.num_instalacao,
-            'num_medidor': resultado.num_medidor,
-            'num_cliente': resultado.num_cliente,
-            'modalidade': resultado.modalidade,
-            'num_contrato': resultado.num_contrato,
-            'tipo_pagto': resultado.tipo_pagto,
-            'email_agua': resultado.email_agua,
-            'cidade': resultado.cidade,
-            'cod_ligacao_rgi': resultado.cod_ligacao_rgi,
-            'id_pro_agua': resultado.id_pro_agua,
-            'leitura_anterior': resultado.leitura_anterior,
-            'leitura_atual': resultado.leitura_atual,
-            'consumo_agua_m3': resultado.consumo_agua_m3,
-            'consumo_esgoto_m3': resultado.consumo_esgoto_m3,
-            'vlr_agua': resultado.vlr_agua,
-            'vlr_esgoto': resultado.vlr_esgoto,
-            'vlr_total': resultado.vlr_total,
-            'num_instalacao_pro': resultado.num_instalacao,
-            'num_medidor_pro': resultado.num_medidor,
-            'num_cliente_pro': resultado.num_cliente,
-            'cod_ligacao_rgi_pro': resultado.cod_ligacao_rgi,
-            'num_contrato_pro': resultado.num_contrato
-        })
+        if not tipo_documento or not arquivo_csv:
+            return Response({'error': 'Tipo de documento e arquivo CSV são necessários.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    return JsonResponse(data, safe=False)
+        try:
+            caminho_csv = default_storage.save(arquivo_csv.name, arquivo_csv)
+            if tipo_documento == 'contrato':
+                self.inserir_contratos_do_csv(caminho_csv)
+            elif tipo_documento == 'fatura':
+                self.inserir_faturas_do_csv(caminho_csv)
+            else:
+                return Response({'error': 'Tipo de documento inválido.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'success': f'Dados do {tipo_documento} inseridos com sucesso.'}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    def inserir_contratos_do_csv(self, caminho_do_csv):
+        with default_storage.open(caminho_do_csv, 'r') as arquivo_csv:
+            leitor_csv = csv.DictReader(arquivo_csv)
+            for linha in leitor_csv:
+                numero_cliente = linha['Número Cliente'] or None
+                
+                numero_contrato = linha['Número Contrato']
+                if not numero_contrato.isdigit():
+                    numero_contrato = None
 
-class MediaConsumoUltimosTresMesesAPIView(APIView):
-    def get(self, request, num_cliente):
-        resultado = calcular_media_ultimos_tres_meses(num_cliente)
-        if resultado is not None:
-            return Response({'resultado': resultado})
-        else:
-            return Response({'mensagem': 'Nenhum registro encontrado nos últimos três meses.'}, status=404)
+                codigo_de_ligacao_rgi = linha['Código de Ligação (RGI)']
+                if ClienteContrato.objects.filter(codigo_de_ligacao_rgi=codigo_de_ligacao_rgi).exists():
+                    continue
+
+                fornecedor_agua, _ = FornecedorAgua.objects.get_or_create(
+                    fornecedor=linha['Fornecedor'],
+                    cod_companhia=linha['Codificação da Companhia'],
+                    planta=linha['Planta'],
+                    codigo_de_ligacao_rgi=codigo_de_ligacao_rgi
+                )
+
+                endereco, _ = Endereco.objects.get_or_create(
+                    endereco_instalacao=linha['Endereço de Instalação'],
+                    cidade=linha['Nome do Contrato']
+                )
+
+                contrato, _ = ClienteContrato.objects.get_or_create(
+                    nome_contrato=linha['Nome do Contrato'],
+                    email=linha['Campo Extra de Acesso 1'],
+                    ativo=linha['Ativado'],
+                    numero_contrato=numero_contrato,
+                    numero_cliente=numero_cliente,
+                    codigo_de_ligacao_rgi=codigo_de_ligacao_rgi
+                )
+
+    def inserir_faturas_do_csv(self, caminho_do_csv):
+        with default_storage.open(caminho_do_csv, 'r') as arquivo_csv:
+            leitor_csv = csv.DictReader(arquivo_csv)
+            for linha in leitor_csv:
+                contrato = ClienteContrato.objects.get(codigo_de_ligacao_rgi=linha['Código de Ligação (RGI)'])
+
+                endereco_instalacao = linha.get('Endereço de Instalação', 'Endereço desconhecido')
+
+                cidade = linha.get('Cidade', '')
+
+                endereco, _ = Endereco.objects.get_or_create(
+                    endereco_instalacao=endereco_instalacao,
+                    cidade=cidade
+                )
+
+                consumo_agua_m3 = self.converter_para_decimal(linha['Consumo de Água m³'])
+                consumo_esgoto_m3 = self.converter_para_decimal(linha['Consumo de Esgoto m³'])
+                vlr_agua = self.converter_para_decimal(linha['Valor Água R$'])
+                vlr_esgoto = self.converter_para_decimal(linha['Valor Esgoto R$'])
+                vlr_total = self.converter_para_decimal(linha['Total R$'])
+
+                leitura_anterior = self.converter_para_data(linha['Leitura Anterior'])
+                leitura_atual = self.converter_para_data(linha['Leitura Atual'])
+
+                FatoContratoAgua.objects.create(
+                    codigo_de_ligacao_rgi=contrato,
+                    id_endereco=endereco,
+                    consumo_agua_m3=consumo_agua_m3,
+                    consumo_esgoto_m3=consumo_esgoto_m3,
+                    vlr_agua=vlr_agua,
+                    vlr_esgoto=vlr_esgoto,
+                    vlr_total=vlr_total,
+                    leitura_anterior=leitura_anterior,
+                    leitura_atual=leitura_atual,
+                )
+
+    def converter_para_decimal(self, valor_str):
+            valor_str = valor_str.strip().replace('.', '').replace(',', '.')
+            return float(valor_str)
+    
+    def converter_para_data(self, data_str):
+        try:
+            if data_str == '00/00/0000':
+                return None
+            else:
+                return datetime.strptime(data_str, '%d/%m/%Y')
+        except ValueError:
+            return None

@@ -16,3 +16,8 @@ class AguaAdmin(admin.ModelAdmin):
 @admin.register(agua.FatoContratoAgua)
 class AguaAdmin(admin.ModelAdmin):
     list_display = [field.name for field in agua.FatoContratoAgua._meta.fields]
+
+
+@admin.register(agua.ClienteContrato)
+class AguaAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in agua.ClienteContrato._meta.fields]
