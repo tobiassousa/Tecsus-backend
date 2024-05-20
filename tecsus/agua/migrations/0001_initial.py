@@ -48,16 +48,5 @@ class Migration(migrations.Migration):
                 ('data_extra', models.JSONField()),
                 ('contrato_agua', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='agua.contratoagua')),
             ],
-        ),
-        migrations.CreateModel(
-            name='AlertaAgua',
-            fields=[
-                ('id_alerta', models.AutoField(primary_key=True)),
-                ('id_user_alerta', models.CharField(max_length=10000)),
-                ('alert_user_email', models.CharField(max_length=10000)),
-                ('alert_consumo_media', models.CharField(max_length=10000)),
-                ('alert_consumo_atual', models.CharField(max_length=10000)),
-                ('alert_conta', models.CharField(max_length=10000)),               
-            ]
         )
     ]

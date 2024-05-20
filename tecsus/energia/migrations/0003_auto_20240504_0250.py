@@ -8,21 +8,3 @@ class Migration(migrations.Migration):
     dependencies = [
         ('energia', '0002_remove_proenergia_contrato_energia'),
     ]
-
-    operations = [
-        migrations.AlterField(
-            model_name='alertaenergia',
-            name='alert_consumo_atual',
-            field=models.CharField(max_length=1000),
-        ),
-        migrations.AlterField(
-            model_name='alertaenergia',
-            name='alert_consumo_media',
-            field=models.CharField(max_length=1000),
-        ),
-        migrations.AlterField(
-            model_name='alertaenergia',
-            name='alert_user_email',
-            field=models.EmailField(max_length=1000),
-        ),
-    ]
