@@ -1,7 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from agua.serializer import AlertaAguaSerializer
-from .models import AlertaAgua, ContratoAgua, ProAgua
+from .models import ContratoAgua, ProAgua
 from django.db.models import F
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
@@ -41,19 +40,6 @@ class ProAguaAPIView(APIView):
                  'num_contrato': pro.num_contrato,
                  'data_extra': pro.data_extra} for pro in pros_agua]
         return Response(data)
-    
-class AlertaAguaAPIView(APIView):
-    def get(self, request):
-        alertas = AlertaAgua.objects.all()
-        serializer = AlertaAguaSerializer(alertas, many=True)
-        return Response(serializer.data)
-    
-    def post(self, request):
-        serializer = AlertaAguaSerializer(data = request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @require_http_methods(["GET"])
