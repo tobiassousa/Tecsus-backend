@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import AlertaEnergiaAPIView, ContratoEnergiaAPIView, ProEnergiaAPIView, consulta_contrato_pro_energia, MediaConsumoUltimosTresMesesAPIView
+from .views import ContratoEnergiaAPIView, ProEnergiaAPIView, consulta_contrato_pro_energia, MediaConsumoUltimosTresMesesAPIView
 
 urlpatterns = [
     path('contrato_energia/', ContratoEnergiaAPIView.as_view(), name='contrato_energia_api'),
