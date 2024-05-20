@@ -2,9 +2,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import AlertaEnergia, ContratoEnergia, ProEnergia
 from energia.serializer import AlertaEnergiaSerializer
-
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
+from .models import ContratoEnergia, ProEnergia
+from .utils import calcular_media_ultimos_tres_meses
 
 class ContratoEnergiaAPIView(APIView):
     def get(self, request):
@@ -57,10 +58,11 @@ class AlertaEnergiaAPIView(APIView):
 def consulta_contrato_pro_energia(request):
     resultados = ContratoEnergia.objects.raw('''
         SELECT tce.id_contrato_energia, tce.fornecedor, tce.num_instalacao, tce.num_medidor,
-               tce.num_cliente, tce.modalidade, tce.forma_pagto, tce.cidade, pe.id_pro_energia,
+               tce.num_cliente, tce.modalidade, tce.forma_pagto, tce.cidade, tce.hor_ponta, 
+               tce.dem_ponta, tce.dem_fora_ponta, pe.id_pro_energia,
                pe.leitura_anterior, pe.leitura_atual, pe.demanda_faturada_kw, pe.total,
                pe.fornecedor, pe.num_instalacao, pe.num_cliente, pe.modalidade,
-               pe.num_contrato
+               pe.num_contrato, pe.ben_tar_bruto, pe.ben_tar_liq
         FROM energia_contratoenergia tce
         INNER JOIN energia_proenergia pe ON pe.num_instalacao = tce.num_instalacao
         WHERE pe.num_contrato <> ''
@@ -77,6 +79,9 @@ def consulta_contrato_pro_energia(request):
             'modalidade_contrato': resultado.modalidade,
             'forma_pagto_contrato': resultado.forma_pagto,
             'cidade': resultado.cidade,
+            'hor_ponta': resultado.hor_ponta,
+            'dem_ponta': resultado.dem_ponta,
+            'dem_fora_ponta': resultado.dem_fora_ponta,
             'id_pro_energia': resultado.id_pro_energia,
             'leitura_anterior_energia': resultado.leitura_anterior,
             'leitura_atual_energia': resultado.leitura_atual,
@@ -86,9 +91,24 @@ def consulta_contrato_pro_energia(request):
             'num_instalacao_energia': resultado.num_instalacao,
             'num_cliente_energia': resultado.num_cliente,
             'modalidade_energia': resultado.modalidade,
-            'num_contrato_energia': resultado.num_contrato
+            'num_contrato_energia': resultado.num_contrato,
+            'ben_tar_bruto': resultado.ben_tar_bruto,
+            'ben_tar_liq': resultado.ben_tar_liq
         })
 
     return JsonResponse(data, safe=False)
 
-    
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .utils import calcular_media_ultimos_tres_meses, verificar_consumo_mes_anterior
+
+class MediaConsumoUltimosTresMesesAPIView(APIView):
+    def get(self, request, num_cliente):
+        resultado_media = calcular_media_ultimos_tres_meses(num_cliente)
+        resultado_verificacao = verificar_consumo_mes_anterior(num_cliente)
+        
+        if resultado_media is not None:
+            return Response({'resultado_media': resultado_media, 'verificacao_consumo_mes_anterior': resultado_verificacao})
+        else:
+            return Response({'mensagem': 'Nenhum registro encontrado nos últimos três meses.'}, status=404)

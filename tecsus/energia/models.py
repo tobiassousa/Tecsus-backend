@@ -11,6 +11,9 @@ class ContratoEnergia(models.Model):
     email_energia = models.CharField(max_length=10000)
     cidade = models.CharField(max_length=10000)
     num_contrato = models.CharField(max_length=10000)
+    hor_ponta = models.CharField(max_length=1000)
+    dem_ponta = models.CharField(max_length=1000)
+    dem_fora_ponta = models.CharField(max_length=1000)
     data_extra = models.JSONField()
 
 class ProEnergia(models.Model):
@@ -24,8 +27,9 @@ class ProEnergia(models.Model):
     num_cliente = models.CharField(max_length=10000)
     modalidade = models.CharField(max_length=10000)
     num_contrato = models.CharField(max_length=10000)
+    ben_tar_bruto = models.CharField(max_length=10000)
+    ben_tar_liq = models.CharField(max_length=10000)
     data_extra = models.JSONField()
-
 
 class AlertaEnergia(models.Model):
     id_alerta = models.AutoField(primary_key=True)
@@ -34,4 +38,4 @@ class AlertaEnergia(models.Model):
     alert_consumo_media = models.CharField(max_length=1000)
     alert_consumo_atual = models.CharField(max_length=1000)
     alert_conta = models.CharField(max_length=10000)
-
+    

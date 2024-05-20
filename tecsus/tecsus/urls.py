@@ -17,11 +17,21 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+<<<<<<< HEAD
 from .view import UploadCSVView
+=======
+from alerta.views import AlertaAguaAPIView
+from .view import UploadCSVView, EnviarEmailView
+>>>>>>> dev
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('upload/<str:model>/<str:documento>/', UploadCSVView.as_view(), name='upload_csv_teste'),
     path('api/energia/', include('energia.urls')), 
     path('api/agua/', include('agua.urls')), 
+<<<<<<< HEAD
+=======
+    path('api/alerta/', include('alerta.urls')),
+    path('enviar-email/<str:email>/', EnviarEmailView.as_view(), name='enviar_email'),
+>>>>>>> dev
 ]

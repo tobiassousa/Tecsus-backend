@@ -100,3 +100,11 @@ def consulta_contrato_pro_agua(request):
 
     return JsonResponse(data, safe=False)
 
+
+class MediaConsumoUltimosTresMesesAPIView(APIView):
+    def get(self, request, num_cliente):
+        resultado = calcular_media_ultimos_tres_meses(num_cliente)
+        if resultado is not None:
+            return Response({'resultado': resultado})
+        else:
+            return Response({'mensagem': 'Nenhum registro encontrado nos últimos três meses.'}, status=404)
