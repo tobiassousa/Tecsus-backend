@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import ContratoEnergia, ProEnergia
+from .models import AlertaEnergia, ContratoEnergia, ProEnergia
+from energia.serializer import AlertaEnergiaSerializer
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from .models import ContratoEnergia, ProEnergia
@@ -38,6 +39,19 @@ class ProEnergiaAPIView(APIView):
                  'num_contrato': pro.num_contrato,
                  'data_extra': pro.data_extra} for pro in pro_energias]
         return Response(data)
+    
+class AlertaEnergiaAPIView(APIView):
+    def get(self, request):
+        alertas = AlertaEnergia.objects.all()
+        serializer = AlertaEnergiaSerializer(alertas, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        serializer = AlertaEnergiaSerializer(data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @require_http_methods(["GET"])
