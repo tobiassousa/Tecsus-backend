@@ -1,9 +1,11 @@
 from django.urls import path
-from .views import ContratoEnergiaAPIView, ProEnergiaAPIView, consulta_contrato_pro_energia, MediaConsumoUltimosTresMesesAPIView
+from energia.views import InserirDadosAPIView, EnderecoEnergiaAPIView, FornecedorEnergiaAPIView, ClienteContratoAPIView, FatoContratoEnergiaAPIView
 
 urlpatterns = [
-    path('contrato_energia/', ContratoEnergiaAPIView.as_view(), name='contrato_energia_api'),
-    path('pro_energia/', ProEnergiaAPIView.as_view(), name='pro_energia_api'),
-    path('query_energia/', consulta_contrato_pro_energia, name='query_energia'),
-    path('media_consumo/<str:num_cliente>/', MediaConsumoUltimosTresMesesAPIView.as_view(), name='media_consumo_tres_meses'),
+    path('upload/', InserirDadosAPIView.as_view(), name='upload_csv'),
+    path('fornecedores_energia/', FornecedorEnergiaAPIView.as_view(), name='fornecedores_energia_api'),
+    path('enderecos/', EnderecoEnergiaAPIView.as_view(), name='enderecos_api'),
+    path('clientes_contratos/', ClienteContratoAPIView.as_view(), name='clientes_contratos_api'),
+    path('fatos_contratos_energia/', FatoContratoEnergiaAPIView.as_view(), name='fatos_contratos_energia_api'),
+    # path('compare/<int:num_contrato>/', CompareMesAtualComTresUltimosMeses.as_view(), name='compare_current_month_to_last_three_months'),
 ]

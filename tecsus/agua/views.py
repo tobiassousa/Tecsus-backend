@@ -1,4 +1,5 @@
 import csv
+import os
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -59,7 +60,9 @@ class InserirDadosAPIView(APIView):
             return Response({'error': 'Tipo de documento e arquivo CSV são necessários.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            caminho_csv = default_storage.save(arquivo_csv.name, arquivo_csv)
+            pasta_csv = 'csv_upload/agua'
+            caminho_csv = os.path.join(pasta_csv, arquivo_csv.name)
+            caminho_relatorio = default_storage.save(caminho_csv, arquivo_csv)            
             if tipo_documento == 'contrato':
                 self.inserir_contratos_do_csv(caminho_csv)
             elif tipo_documento == 'fatura':
