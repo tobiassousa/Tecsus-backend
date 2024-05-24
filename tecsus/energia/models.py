@@ -47,6 +47,7 @@ class ClienteContrato(models.Model):
     ativo = models.CharField(max_length=255)
     num_contrato = models.BigIntegerField(null=True)
     num_cliente = models.CharField(max_length=255, null=True)
+    num_instalacao = models.CharField(max_length=255, null=True)
     grupo = models.CharField(max_length=255)
     forma_pagamento = models.CharField(max_length=255, null=True)
     planta = models.CharField(max_length=255, null=True)

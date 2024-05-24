@@ -7,7 +7,7 @@ from .models import FornecedorEnergia, EnderecoEnergia, FatoContratoEnergia, Cli
 from datetime import datetime
 from django.core.files.storage import default_storage
 from rest_framework import generics
-from .serializers import FornecedorEnergiaSerializer, FatoContratoEnergiaSerializer, ClienteContratoSerializer
+from .serializers import FornecedorEnergiaSerializer, FatoContratoEnergiaSerializer, ClienteContratoSerializer, EnderecoSerializer
 # from .utils import comparar_media_mes_atual_com_ultimos_tres_meses
 
 
@@ -59,6 +59,7 @@ class InserirDadosAPIView(APIView):
             for linha in leitor_csv:
                 num_cliente = linha['Número Cliente'] or None
                 num_contrato = linha['Número Contrato']
+
                 if not num_contrato.isdigit():
                     num_contrato = None
 
@@ -82,15 +83,14 @@ class InserirDadosAPIView(APIView):
                     num_contrato=num_contrato,
                     num_cliente=num_cliente,
                     planta = linha['Planta'],
-                    forma_pagamento = linha['Forma de Pagamento']
+                    forma_pagamento = linha['Forma de Pagamento'],
+                    num_instalacao = linha['Número Instalação']
                 )
 
     def inserir_faturas_do_csv(self, caminho_do_csv):
         with default_storage.open(caminho_do_csv, 'r') as arquivo_csv:
             leitor_csv = csv.DictReader(arquivo_csv)
             for linha in leitor_csv:
-                num_contrato = linha['Número Contrato']
-
                 leitura_anterior = self.converter_para_data(linha['Leitura Anterior'])
                 leitura_atual = self.converter_para_data(linha['Leitura Atual'])
 
@@ -113,6 +113,7 @@ class InserirDadosAPIView(APIView):
                 grupo = linha['grupo']
                 tipo_consumidor = linha['Código de Consumidor']
                 num_instalacao = linha['Número Instalação']
+                num_contrato = linha['Número Contrato']
                 num_medidor = linha['Número Medidor']
                 leitura_atual = leitura_atual
                 leitura_anterior = leitura_anterior
@@ -162,3 +163,35 @@ class InserirDadosAPIView(APIView):
                 return datetime.strptime(data_str, '%d/%m/%Y')
         except ValueError:
             return None
+        
+
+
+class AllEnergiaDataAPIView(APIView):
+    def get(self, request, format=None):
+        fatos_contrato = FatoContratoEnergia.objects.all()
+        fatos_contrato_data = FatoContratoEnergiaSerializer(fatos_contrato, many=True).data
+        
+        clientes_contrato = ClienteContrato.objects.all()
+        clientes_contrato_data = ClienteContratoSerializer(clientes_contrato, many=True).data
+        
+        enderecos_energia = EnderecoEnergia.objects.filter(num_contrato__in=[cliente['num_contrato'] for cliente in clientes_contrato_data])
+        enderecos_energia_data = EnderecoSerializer(enderecos_energia, many=True).data
+        
+        fornecedores_energia = FornecedorEnergia.objects.filter(num_contrato__in=[cliente['num_contrato'] for cliente in clientes_contrato_data])
+        fornecedores_energia_data = FornecedorEnergiaSerializer(fornecedores_energia, many=True).data
+        
+        combined_data = []
+        for cliente in clientes_contrato_data:
+            num_instalacao = cliente['num_instalacao']
+            fatos_contrato_cliente = [fato for fato in fatos_contrato_data if fato['num_instalacao'] == num_instalacao]
+            endereco_cliente = [endereco for endereco in enderecos_energia_data if endereco['num_contrato'] == cliente['num_contrato']]
+            fornecedor_cliente = [fornecedor for fornecedor in fornecedores_energia_data if fornecedor['num_contrato'] == cliente['num_contrato']]
+            
+            combined_data.append({
+                'cliente': cliente,
+                'fatos_contrato': fatos_contrato_cliente,
+                'endereco': endereco_cliente[0] if endereco_cliente else None,
+                'fornecedor': fornecedor_cliente[0] if fornecedor_cliente else None
+            })
+
+        return Response(combined_data)

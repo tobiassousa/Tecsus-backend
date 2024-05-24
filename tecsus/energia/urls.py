@@ -1,5 +1,5 @@
 from django.urls import path
-from energia.views import InserirDadosAPIView, EnderecoEnergiaAPIView, FornecedorEnergiaAPIView, ClienteContratoAPIView, FatoContratoEnergiaAPIView
+from energia.views import InserirDadosAPIView, EnderecoEnergiaAPIView, FornecedorEnergiaAPIView, ClienteContratoAPIView, FatoContratoEnergiaAPIView, AllEnergiaDataAPIView
 
 urlpatterns = [
     path('upload/', InserirDadosAPIView.as_view(), name='upload_csv'),
@@ -7,5 +7,6 @@ urlpatterns = [
     path('enderecos/', EnderecoEnergiaAPIView.as_view(), name='enderecos_api'),
     path('clientes_contratos/', ClienteContratoAPIView.as_view(), name='clientes_contratos_api'),
     path('fatos_contratos_energia/', FatoContratoEnergiaAPIView.as_view(), name='fatos_contratos_energia_api'),
+    path('all_data/', AllEnergiaDataAPIView.as_view(), name='all_data_api'),
     # path('compare/<int:num_contrato>/', CompareMesAtualComTresUltimosMeses.as_view(), name='compare_current_month_to_last_three_months'),
 ]
