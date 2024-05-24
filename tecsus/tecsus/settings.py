@@ -152,3 +152,10 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+
+COMMITIZEN = {
+    'name': 'cz_conventional_commits',
+    'path': 'cz_conventional_commits',
+    'branch_length': 0,
+}
+

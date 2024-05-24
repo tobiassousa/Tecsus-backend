@@ -1,11 +1,23 @@
 from django.contrib import admin
 
-from .models import ContratoAgua, ProAgua
+import agua.models as agua
 
-@admin.register(ContratoAgua)
-class AguaAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in ContratoAgua._meta.fields]
 
-@admin.register(ProAgua)
+@admin.register(agua.FornecedorAgua)
 class AguaAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in ProAgua._meta.fields]
+    list_display = [field.name for field in agua.FornecedorAgua._meta.fields]
+
+
+@admin.register(agua.Endereco)
+class AguaAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in agua.Endereco._meta.fields]
+
+
+@admin.register(agua.FatoContratoAgua)
+class AguaAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in agua.FatoContratoAgua._meta.fields]
+
+
+@admin.register(agua.ClienteContrato)
+class AguaAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in agua.ClienteContrato._meta.fields]
