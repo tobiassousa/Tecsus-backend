@@ -2,11 +2,11 @@ name: Build Application
 
 on: 
   push:
-    branches: 
-      - xp-35-build
+    branches:
+      - "*"
   pull_request: 
-    branches: 
-      - xp-35-build
+    branches:
+      - "*"
     types:
       - closed
 

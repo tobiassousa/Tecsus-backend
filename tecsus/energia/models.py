@@ -50,3 +50,4 @@ class ClienteContrato(models.Model):
     grupo = models.CharField(max_length=255)
     forma_pagamento = models.CharField(max_length=255, null=True)
     planta = models.CharField(max_length=255, null=True)
+ 
