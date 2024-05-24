@@ -48,5 +48,5 @@ class Migration(migrations.Migration):
                 ('data_extra', models.JSONField()),
                 ('contrato_agua', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='agua.contratoagua')),
             ],
-        ),
+        )
     ]

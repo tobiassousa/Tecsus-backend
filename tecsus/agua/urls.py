@@ -1,4 +1,5 @@
 from django.urls import path
+
 from agua.views import InserirDadosAPIView, FornecedorAguaAPIView, EnderecoAPIView, ClienteContratoAPIView, FatoContratoAguaList, AllDataAPIView, CompareMesAtualComTresUltimosMeses, AllDataAPIView
 
 urlpatterns = [

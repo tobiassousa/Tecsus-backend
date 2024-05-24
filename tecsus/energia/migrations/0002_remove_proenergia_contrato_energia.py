@@ -8,10 +8,3 @@ class Migration(migrations.Migration):
     dependencies = [
         ('energia', '0001_initial'),
     ]
-
-    operations = [
-        migrations.RemoveField(
-            model_name='proenergia',
-            name='contrato_energia',
-        ),
-    ]
