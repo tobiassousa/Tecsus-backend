@@ -9,6 +9,7 @@ from django.core.files.storage import default_storage
 from rest_framework import generics
 from .serializers import FornecedorAguaSerializer, EnderecoSerializer, ClienteContratoSerializer, FatoContratoAguaSerializer
 from .utils import comparar_media_mes_atual_com_ultimos_tres_meses
+from django.db import connection
 
 
 class FornecedorAguaAPIView(generics.ListAPIView):
@@ -26,9 +27,11 @@ class ClienteContratoAPIView(generics.ListAPIView):
     serializer_class = ClienteContratoSerializer
 
 
-class FatoContratoAguaAPIView(generics.ListAPIView):
-    queryset = FatoContratoAgua.objects.all()
-    serializer_class = FatoContratoAguaSerializer
+class FatoContratoAguaList(APIView):
+    def get(self, request, format=None):
+        contratos = FatoContratoAgua.objects.all()
+        serializer = FatoContratoAguaSerializer(contratos, many=True)
+        return Response(serializer.data)
 
 
 class AllDataAPIView(APIView):
@@ -165,3 +168,36 @@ class CompareMesAtualComTresUltimosMeses(APIView):
             return Response({"message": comparison_result}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    
+class AllDataAPIView(APIView):
+    def get(self, request, format=None):
+        fornecedores = FornecedorAgua.objects.all()
+        enderecos = Endereco.objects.all()
+        contratos = ClienteContrato.objects.all()
+        fatos_contrato = FatoContratoAgua.objects.all()
+
+        fornecedores_data = FornecedorAguaSerializer(fornecedores, many=True).data
+        enderecos_data = EnderecoSerializer(enderecos, many=True).data
+        contratos_data = ClienteContratoSerializer(contratos, many=True).data
+        fatos_contrato_data = FatoContratoAguaSerializer(fatos_contrato, many=True).data
+
+        combined_data = {}
+        for contrato_data in contratos_data:
+            codigo_de_ligacao_rgi = contrato_data['codigo_de_ligacao_rgi']
+            fornecedor_data = [f for f in fornecedores_data if f['codigo_de_ligacao_rgi'] == codigo_de_ligacao_rgi]
+            fato_contrato_data = [f for f in fatos_contrato_data if f['codigo_de_ligacao_rgi'] == codigo_de_ligacao_rgi]
+
+            endereco_data = None
+            if fato_contrato_data and 'id_endereco' in fato_contrato_data[0]:
+                endereco_id = fato_contrato_data[0]['id_endereco']
+                endereco_data = [e for e in enderecos_data if e['id_endereco'] == endereco_id]
+
+            combined_data[codigo_de_ligacao_rgi] = {
+                'contrato': contrato_data,
+                'fornecedor': fornecedor_data[0] if fornecedor_data else None,
+                'endereco': endereco_data[0] if endereco_data else None,
+                'fato_contrato': fato_contrato_data[0] if fato_contrato_data else None
+            }
+
+        return Response(combined_data)
