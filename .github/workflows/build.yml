@@ -1,17 +1,18 @@
-name: Build Application
+name: Build and Unit Test Pipeline
 
-on: 
+on:
   push:
     branches:
       - "*"
-  pull_request: 
-    branches:
-      - "*"
-    types:
-      - closed
 
-jobs: 
-  build:
+  pull_request:
+    branches:
+      - "dev"
+      - "main"
+
+jobs:
+  build-unit-tests:
+    name: Unit Tests in Push
     runs-on: ubuntu-latest
 
     steps:
@@ -19,18 +20,27 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.x
+          python-version: 3.10.5
+      - name: Activate enviroment
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+        working-directory: tecsus
+    
+      - name: Build project and Verify dependencies
+        run: |
+          docker-compose build
+        working-directory: tecsus
 
-      - name: Run tests
-        run: pytest
-
-      - name: Login to Docker Hub
-        run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_ACCESS_TOKEN}}
-
-      - name: Build Docker Image
-        run: docker build -t user/python-app .
-
-      - name: Push Docker Image
-        run: docker push user/python-app
+      - name: Run Migrations
+        run: |
+          docker-compose run web python manage.py makemigrations
+          docker-compose run web python manage.py migrate
+        working-directory: tecsus
+        
+      - name: Run Unit Tests
+        run: |
+          docker-compose run web pytest
+        working-directory: tecsus
