@@ -13,8 +13,44 @@ from django.db import connection
 
 
 class FornecedorAguaAPIView(generics.ListAPIView):
-    queryset = FornecedorAgua.objects.all()
-    serializer_class = FornecedorAguaSerializer
+    def get(self, request, *args, **kwargs):
+        id_fornecedor_agua = self.kwargs.get('id_fornecedor_agua')
+        
+        if id_fornecedor_agua is not None:
+            try:
+                fornecedor = FornecedorAgua.objects.get(id_fornecedor_agua=id_fornecedor_agua)
+                serializer = FornecedorAguaSerializer(fornecedor)
+                return Response(serializer.data)
+            except FornecedorAgua.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            fornecedores = FornecedorAgua.objects.all()
+            serializer = FornecedorAguaSerializer(fornecedores, many=True)
+            return Response(serializer.data)
+    
+    def post(self, request, format=None):
+        serializer = FornecedorAguaSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def put(self, request, *args, **kwargs):
+        id_fornecedor_agua = self.kwargs.get('id_fornecedor_agua')
+        
+        if id_fornecedor_agua is not None:
+            try:
+                fornecedor = FornecedorAgua.objects.get(id_fornecedor_agua=id_fornecedor_agua)
+                serializer = FornecedorAguaSerializer(fornecedor, data=request.data, partial=True)
+                
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            except FornecedorAgua.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({"detail": "ID do fornecedor de água não fornecido."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class EnderecoAPIView(generics.ListAPIView):
@@ -23,8 +59,44 @@ class EnderecoAPIView(generics.ListAPIView):
 
 
 class ClienteContratoAPIView(generics.ListAPIView):
-    queryset = ClienteContrato.objects.all()
-    serializer_class = ClienteContratoSerializer
+    def get(self, request, *args, **kwargs):
+        codigo_de_ligacao_rgi = self.kwargs.get('codigo_de_ligacao_rgi')
+        
+        if codigo_de_ligacao_rgi is not None:
+            try:
+                cliente = ClienteContrato.objects.get(codigo_de_ligacao_rgi=codigo_de_ligacao_rgi)
+                serializer = ClienteContratoSerializer(cliente)
+                return Response(serializer.data)
+            except ClienteContrato.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            clientes = ClienteContrato.objects.all()
+            serializer = ClienteContratoSerializer(clientes, many=True)
+            return Response(serializer.data)
+    
+    def post(self, request, format=None):
+        serializer = ClienteContratoSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def put(self, request, *args, **kwargs):
+        codigo_de_ligacao_rgi = self.kwargs.get('codigo_de_ligacao_rgi')
+        
+        if codigo_de_ligacao_rgi is not None:
+            try:
+                cliente = ClienteContrato.objects.get(codigo_de_ligacao_rgi=codigo_de_ligacao_rgi)
+                serializer = ClienteContratoSerializer(cliente, data=request.data, partial=True)
+                
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            except ClienteContrato.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({"detail": "ID do cliente não fornecido."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class FatoContratoAguaList(APIView):
