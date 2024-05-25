@@ -11,3 +11,5 @@ docker-compose run web python manage.py migrate
 REM Iniciando contêineres Docker
 echo Iniciando contêineres Docker...
 docker-compose up
+
+

@@ -65,3 +65,5 @@ def test_fato_contrato_agua_creation():
     assert fato_contrato.consumo_agua_m3 == Decimal('100.50')
     assert fato_contrato.vlr_total == Decimal('201.00')
   
+
+  
