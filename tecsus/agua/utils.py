@@ -1,64 +1,42 @@
 from datetime import datetime, timedelta
-from .models import ProAgua
+from django.db.models import Avg
+from .models import FatoContratoAgua
 
-def corrigir_e_converter(valor_str):
-    valor_str = valor_str.strip().replace('.', '').replace(',', '.')
-    try:
-        return float(valor_str)
-    except ValueError:
-        return 0.0
+def calcular_media_ultimos_tres_meses(cod_ligacao_rgi):
+    hoje = datetime.now()
+    tres_meses_atras = hoje - timedelta(days=90)
+    tres_meses_atras = datetime(tres_meses_atras.year, tres_meses_atras.month, 1)
 
-def calcular_media_ultimos_tres_meses(num_cliente):
-    data_tres_meses_atras = datetime.now() - timedelta(days=90)
+    media_ultimos_tres_meses = FatoContratoAgua.objects.filter(
+        codigo_de_ligacao_rgi=cod_ligacao_rgi,
+        leitura_atual__gte=tres_meses_atras,
+        leitura_atual__lt=hoje
+    ).aggregate(Avg('vlr_total'))
 
-    registros = ProAgua.objects.filter(
-        num_cliente=num_cliente,
-        leitura_atual__gte=data_tres_meses_atras
-    )
+    return media_ultimos_tres_meses['vlr_total__avg'] or 0
 
-    valores_corrigidos = []
-    for registro in registros:
-        valor_corrigido = corrigir_e_converter(registro.vlw_total)
-        if valor_corrigido is not None:
-            valores_corrigidos.append(valor_corrigido)
+def calcular_media_mes_atual(cod_ligacao_rgi):
+    hoje = datetime.now()
+    primeiro_dia_do_mes = datetime(hoje.year, hoje.month, 1)
+    proximo_mes = hoje.month % 12 + 1
+    proximo_ano = hoje.year + (hoje.month // 12)
+    primeiro_dia_proximo_mes = datetime(proximo_ano, proximo_mes, 1)
+    
+    media_mes_atual = FatoContratoAgua.objects.filter(
+        codigo_de_ligacao_rgi=cod_ligacao_rgi,
+        leitura_atual__gte=primeiro_dia_do_mes,
+        leitura_atual__lt=primeiro_dia_proximo_mes
+    ).aggregate(Avg('vlr_total'))
 
-    if valores_corrigidos:
-        media = sum(valores_corrigidos) / len(valores_corrigidos)
-        return media
+    return media_mes_atual['vlr_total__avg'] or 0
+
+def comparar_media_mes_atual_com_ultimos_tres_meses(cod_ligacao_rgi):
+    media_ultimos_tres_meses = calcular_media_ultimos_tres_meses(cod_ligacao_rgi)
+    media_mes_atual = calcular_media_mes_atual(cod_ligacao_rgi)
+
+    if media_mes_atual > media_ultimos_tres_meses:
+        return "O valor médio deste mês é maior que a média dos últimos três meses."
+    elif media_mes_atual < media_ultimos_tres_meses:
+        return "O valor médio deste mês é menor que a média dos últimos três meses."
     else:
-        return None
-
-def verificar_consumo_mes_anterior(num_cliente):
-    mes_atual = datetime.now().month
-    ano_atual = datetime.now().year
-
-    mes_anterior = mes_atual - 1 if mes_atual > 1 else 12
-    ano_anterior = ano_atual if mes_atual > 1 else ano_atual - 1
-
-    data_mes_anterior = datetime(ano_anterior, mes_anterior, 1)
-    data_inicio_mes_atual = datetime(ano_atual, mes_atual, 1)
-    registros_mes_anterior = ProEnergia.objects.filter(
-        num_cliente=num_cliente,
-        leitura_atual__gte=data_mes_anterior,
-        leitura_atual__lt=data_inicio_mes_atual
-    )
-
-    valores_corrigidos = []
-    for registro in registros_mes_anterior:
-        valor_corrigido = corrigir_e_converter(registro.vlw_total)
-        if valor_corrigido is not None:
-            valores_corrigidos.append(valor_corrigido)
-
-    if valores_corrigidos:
-        consumo_mes_anterior = sum(valores_corrigidos)
-        media_ultimos_tres_meses = calcular_media_ultimos_tres_meses(num_cliente)
-        if media_ultimos_tres_meses is not None:
-            if consumo_mes_anterior > media_ultimos_tres_meses:
-                return f"O consumo do mês anterior ({datetime.strftime(data_mes_anterior, '%B')}) foi maior que a média dos últimos três meses."
-            else:
-                return f"O consumo do mês anterior ({datetime.strftime(data_mes_anterior, '%B')}) foi menor ou igual à média dos últimos três meses."
-        else:
-            return "Não foi possível calcular a média dos últimos três meses."
-    else:
-        return "Não há registros para o mês anterior."
-
+        return "O valor médio deste mês é igual à média dos últimos três meses."

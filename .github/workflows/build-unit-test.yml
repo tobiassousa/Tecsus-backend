@@ -1,0 +1,45 @@
+name: Build and Unit Test Pipeline
+
+on:
+  push:
+    branches:
+      - "*"
+
+  pull_request:
+    branches:
+      - "dev"
+
+jobs:
+  build-unit-tests:
+    name: Unit Tests in Push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10.5
+      - name: Activate enviroment
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+        working-directory: tecsus
+    
+      - name: Build project and Verify dependencies
+        run: |
+          docker-compose build
+        working-directory: tecsus
+
+      - name: Run Migrations
+        run: |
+          docker-compose run web python manage.py makemigrations
+          docker-compose run web python manage.py migrate
+        working-directory: tecsus
+        
+      - name: Run Unit Tests
+        run: |
+          docker-compose run web pytest
+        working-directory: tecsus
