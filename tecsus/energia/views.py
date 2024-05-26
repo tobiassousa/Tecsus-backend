@@ -136,9 +136,6 @@ class InserirDadosAPIView(APIView):
                 if not num_contrato.isdigit():
                     num_contrato = None
 
-                if ClienteContrato.objects.filter(num_contrato=num_contrato).exists():
-                    continue
-
                 fornecedor_energia, _ = FornecedorEnergia.objects.get_or_create(
                     fornecedor=linha['Fornecedor'],
                     num_contrato=num_contrato,
@@ -180,7 +177,7 @@ class InserirDadosAPIView(APIView):
                 demanda_ultrapassada = linha['Demanda Ultrapassada (kW)']
                 demanda_pt = linha['Demanda PT (kW)']
                 demanda_fp_cap = linha['Demanda FP CAP (kW)']
-                demanda_fp_ind = linha['Demanda FP IND (kW']
+                demanda_fp_ind = linha['Demanda FP IND (kW)']
                 consumo_pt_vd = consumo_pt_vd
                 consumo_fp_cap_vd = consumo_fp_cap_vd
                 consumo_fp_ind_vd = consumo_fp_ind_vd
