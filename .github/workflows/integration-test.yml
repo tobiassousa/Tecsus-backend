@@ -1,6 +1,10 @@
 name: Integration Test Pipeline
 
 on:
+  push:
+    branches-ignore:
+      - dev
+      - main
 
   pull_request:
     branches:
@@ -27,5 +31,5 @@ jobs:
 
       - name: Run Integration Tests
         run: |
-          docker-compose run web pytest integration -vv
+          pytest integration
         working-directory: tecsus
