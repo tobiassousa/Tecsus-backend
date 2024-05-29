@@ -31,5 +31,5 @@ jobs:
 
       - name: Run Integration Tests
         run: |
-          docker-compose run web pytest integration -vv
+          docker-compose run web pytest -m integration -vv
         working-directory: tecsus
