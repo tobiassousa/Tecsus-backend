@@ -4,6 +4,7 @@ from datetime import date
 from agua.models import FornecedorAgua, Endereco, ClienteContrato, FatoContratoAgua
 
 @pytest.mark.django_db
+@pytest.mark.unit
 def test_fornecedor_agua_creation():
     fornecedor = FornecedorAgua.objects.create(
         fornecedor="Companhia de Água",
@@ -15,6 +16,7 @@ def test_fornecedor_agua_creation():
     assert fornecedor.fornecedor == "Companhia de Água"
 
 @pytest.mark.django_db
+@pytest.mark.unit
 def test_endereco_creation():
     endereco = Endereco.objects.create(
         endereco_instalacao="Rua A, 123",
@@ -24,6 +26,7 @@ def test_endereco_creation():
     assert endereco.endereco_instalacao == "Rua A, 123"
 
 @pytest.mark.django_db
+@pytest.mark.unit
 def test_cliente_contrato_creation():
     cliente = ClienteContrato.objects.create(
         nome_contrato="Contrato A",
@@ -37,6 +40,7 @@ def test_cliente_contrato_creation():
     assert cliente.email == "cliente@example.com"
 
 @pytest.mark.django_db
+@pytest.mark.unit
 def test_fato_contrato_agua_creation():
     endereco = Endereco.objects.create(
         endereco_instalacao="Rua A, 123",
