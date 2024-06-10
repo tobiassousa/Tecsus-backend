@@ -36,3 +36,15 @@ jobs:
       - name: Push Docker Image
         run: docker push datateam23/tecsus-backend
         working-directory: tecsus
+       
+       
+  deploy:
+          needs: build
+          runs-on: self-hosted
+          steps:
+              - name: Pull image from docker hub
+                run: docker pull datateam23/tecsus-backend
+              - name: Run docker container
+                run: docker run -d -p 8080:8080 -e DATABASE_USERNAME=${{secrets.DATABASE_USER}} -e DATABASE_PASSWORD='${{secrets.DATABASE_PASSWORD}}' -e DATABASE_URL=${{secrets.DATABASE_URL}} --name  datateam23/tecsus-backend
+
+
