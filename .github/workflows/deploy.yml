@@ -43,7 +43,7 @@ jobs:
           runs-on: self-hosted
           steps:
               - name: Pull image from docker hub
-                run: docker pull datateam23/tecsus-backend:latest
+                run: sudo docker pull datateam23/tecsus-backend:latest
               - name: Run docker container
-                run: docker run -d -p 8080:8080 -e DATABASE_USERNAME=${{secrets.DATABASE_USER}} -e DATABASE_PASSWORD='${{secrets.DATABASE_PASSWORD}}' -e DATABASE_URL=${{secrets.DATABASE_URL}} --name  datateam23/tecsus-backend
+                run: sudo docker run -d -p 8080:8080 -e DATABASE_USERNAME=${{secrets.DATABASE_USER}} -e DATABASE_PASSWORD='${{secrets.DATABASE_PASSWORD}}' -e DATABASE_URL=${{secrets.DATABASE_URL}} --name tecsus-backend  datateam23/tecsus-backend
 
