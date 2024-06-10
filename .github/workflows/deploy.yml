@@ -1,0 +1,35 @@
+name: Deploy Tecsus
+
+on:
+  push:
+    branches:
+      - xp-48-Deploy
+  pull_request:
+    branches:
+      - xp-48-Deploy
+    types:
+      - closed
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Login Docker Hub
+        run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_ACCESS_TOKEN}}
+
+      - name: Build Docker Image
+        run: docker build -t datateam23/tecsus-backend .
+        working-directory: tecsus
+
+      - name: Push Docker Image
+        run: docker push datateam23/tecsus-backend
+        working-directory: tecsus
