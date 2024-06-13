@@ -24,6 +24,10 @@ RUN pip install --upgrade pip && \
 
 COPY . /app/
 
+RUN chown -R nonroot:nonroot /app
+
 EXPOSE 8000
+
+USER nonroot
 
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
