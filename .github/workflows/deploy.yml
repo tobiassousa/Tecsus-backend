@@ -38,22 +38,22 @@ jobs:
     runs-on: self-hosted
     steps:
         - name: Pull Docker image for backend
-          run: docker pull datateam23/tecsus-backend:latest
+          run: sudo docker pull datateam23/tecsus-backend:latest
   
         - name: Build Docker image for backend
-          run: docker build -f Dockerfile.prod -t tecsus-backend .
+          run: sudo docker build -f Dockerfile.prod -t tecsus-backend .
 
         - name: Run Database
-          run: docker run -d --name postgres-db -e POSTGRES_DB=${{secrets.DATABASE_NAME}} -e POSTGRES_USER=${{secrets.DATABASE_user}} -e POSTGRES_PASSWORD=${{secrets.DATABASE_PASSWORD}} -v postgres_data:/var/lib/postgresql/data postgres:latest
+          run: sudo docker run -d --name postgres-db -e POSTGRES_DB=${{secrets.DATABASE_NAME}} -e POSTGRES_USER=${{secrets.DATABASE_user}} -e POSTGRES_PASSWORD=${{secrets.DATABASE_PASSWORD}} -v postgres_data:/var/lib/postgresql/data postgres:latest
   
         - name: Run Django makemigrations
-          run: docker run --rm --name django-makemigrations --link postgres-db:db -e DATABASE_URL=${{secrets.DATABASE_URL}} tecsus-backend python manage.py makemigrations
+          run: sudo docker run --rm --name django-makemigrations --link postgres-db:db -e DATABASE_URL=${{secrets.DATABASE_URL}} tecsus-backend python manage.py makemigrations
   
         - name: Run Django migrations
-          run: docker run --rm --name django-migrate --link postgres-db:db -e DATABASE_URL=${{secrets.DATABASE_URL}} tecsus-backend python manage.py migrate
+          run: sudo docker run --rm --name django-migrate --link postgres-db:db -e DATABASE_URL=${{secrets.DATABASE_URL}} tecsus-backend python manage.py migrate
   
         - name: Create Django superuser
-          run: docker run --rm --name django-superuser --link postgres-db:db -e DATABASE_URL=${{secrets.DATABASE_URL}} tecsus-backend python manage.py createsuperuser
+          run: sudo docker run --rm --name django-superuser --link postgres-db:db -e DATABASE_URL=${{secrets.DATABASE_URL}} tecsus-backend python manage.py createsuperuser
   
         - name: Start Django backend application
-          run: docker run -d --name tecsus-backend -p 8000:8000 --link postgres-db:db tecsus-backend
+          run: sudo docker run -d --name tecsus-backend -p 8000:8000 --link postgres-db:db tecsus-backend
