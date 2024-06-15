@@ -48,8 +48,3 @@ jobs:
                 run: sudo docker rm -f tecsus-backend
               - name: Run docker container
                 run: sudo docker run -d -p 8000:8000 -e DATABASE_USERNAME=${{secrets.DATABASE_USER}} -e DATABASE_PASSWORD='${{secrets.DATABASE_PASSWORD}}' -e DATABASE_URL=${{secrets.DATABASE_URL}} --name tecsus-backend  datateam23/tecsus-backend
-              - name: Copy migrations script to container
-                run: sudo docker cp ./Tecsus-backend/tecsus/migrations.bat tecsus-backend:/migrations.bat
-              - name: Run migrations script in container
-                run: sudo docker exec tecsus-backend bash -c 'chmod +x /migrations.bat && /migrations.bat'
-
