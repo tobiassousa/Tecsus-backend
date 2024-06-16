@@ -43,7 +43,10 @@ INSTALLED_APPS = [
     'energia',
     'alerta',
     'corsheaders',
+    'user_management',
 ]
+
+AUTH_USER_MODEL = 'user_management.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -58,7 +61,14 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8080',
+    'http://54.234.110.111',
+    'https://54.234.110.111',
+    'http://ec2-54-234-110-111.compute-1.amazonaws.com',
+    'https://ec2-54-234-110-111.compute-1.amazonaws.com'
+    
 ]
+
+ALLOWED_HOSTS = ['*']
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [

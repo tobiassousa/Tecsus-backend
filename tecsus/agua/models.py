@@ -13,6 +13,7 @@ class Endereco(models.Model):
     id_endereco = models.AutoField(primary_key=True)
     endereco_instalacao = models.CharField(max_length=255)
     cidade = models.CharField(max_length=255)
+    codigo_de_ligacao_rgi = models.CharField(max_length=255, null=True)
 
 
 class ClienteContrato(models.Model):

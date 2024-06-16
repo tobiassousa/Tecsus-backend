@@ -23,7 +23,9 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/energia/', include('energia.urls')), 
+    path('api/v1/', include('djoser.urls.jwt')),
     path('api/agua/', include('agua.urls')), 
     path('api/alerta/', include('alerta.urls')),
+    path('api/v1/user/', include('user_management.urls')),
     # path('enviar-email/<str:email>/', EnviarEmailView.as_view(), name='enviar_email'),
 ]

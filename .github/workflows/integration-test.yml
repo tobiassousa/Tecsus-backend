@@ -1,0 +1,31 @@
+name: Integration Test Pipeline
+
+on:
+  pull_request:
+    branches:
+      - "dev"
+
+jobs:
+  run-integration-tests:
+    name: Run Integration Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10.5
+
+      - name: Activate enviroment
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+        working-directory: tecsus
+
+      - name: Run Integration Tests
+        run: |
+          docker-compose run web pytest -m integration -vv
+        working-directory: tecsus
