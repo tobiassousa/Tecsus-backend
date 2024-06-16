@@ -8,7 +8,7 @@ from datetime import datetime
 from django.core.files.storage import default_storage
 from rest_framework import generics
 from .serializers import FornecedorEnergiaSerializer, FatoContratoEnergiaSerializer, ClienteContratoSerializer, EnderecoSerializer
-# from .utils import comparar_media_mes_atual_com_ultimos_tres_meses
+from .utils import comparar_media_mes_atual_com_ultimos_tres_meses
 
 
 class FornecedorEnergiaAPIView(generics.ListAPIView):
@@ -23,7 +23,7 @@ class FornecedorEnergiaAPIView(generics.ListAPIView):
             except FornecedorEnergia.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
         else:
-            fornecedores = FornecedorEnergia.objects.all()
+            fornecedores = FornecedorEnergia.objects.order_by('fornecedor').distinct('fornecedor')
             serializer = FornecedorEnergiaSerializer(fornecedores, many=True)
             return Response(serializer.data)
     
@@ -241,6 +241,14 @@ class InserirDadosAPIView(APIView):
             return None
         
 
+class CompareMesAtualComTresUltimosMeses(APIView):
+    def get(self, request, codigo_de_ligacao_rgi):
+        try:
+            comparison_result = comparar_media_mes_atual_com_ultimos_tres_meses(codigo_de_ligacao_rgi)
+            return Response({"message": comparison_result}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class AllEnergiaDataAPIView(APIView):
     def get(self, request, format=None):
@@ -260,14 +268,56 @@ class AllEnergiaDataAPIView(APIView):
         for cliente in clientes_contrato_data:
             num_instalacao = cliente['num_instalacao']
             fatos_contrato_cliente = [fato for fato in fatos_contrato_data if fato['num_instalacao'] == num_instalacao]
-            endereco_cliente = [endereco for endereco in enderecos_energia_data if endereco['num_contrato'] == cliente['num_contrato']]
-            fornecedor_cliente = [fornecedor for fornecedor in fornecedores_energia_data if fornecedor['num_contrato'] == cliente['num_contrato']]
+            endereco_cliente = next((endereco for endereco in enderecos_energia_data if endereco['num_contrato'] == cliente['num_contrato']), {})
+            fornecedor_cliente = next((fornecedor for fornecedor in fornecedores_energia_data if fornecedor['num_contrato'] == cliente['num_contrato']), {})
             
-            combined_data.append({
-                'cliente': cliente,
-                'fatos_contrato': fatos_contrato_cliente,
-                'endereco': endereco_cliente[0] if endereco_cliente else None,
-                'fornecedor': fornecedor_cliente[0] if fornecedor_cliente else None
-            })
+            for fato in fatos_contrato_cliente:
+                combined_data.append({
+                    'cliente_id': cliente['id_cliente'],
+                    'cliente_nome': cliente['nome_contrato'],
+                    'cliente_email': cliente['email'],
+                    'cliente_ativo': cliente['ativo'],
+                    'cliente_num_contrato': cliente['num_contrato'],
+                    'cliente_num_cliente': cliente['num_cliente'],
+                    'cliente_num_instalacao': cliente['num_instalacao'],
+                    'cliente_grupo': cliente['grupo'],
+                    'cliente_forma_pagamento': cliente['forma_pagamento'],
+                    'cliente_planta': cliente['planta'],
+                    
+                    'fato_id': fato['id_contrato_energia'],
+                    'fato_fic_apurado': fato['fic_apurado'],
+                    'fato_conta_mes': fato['conta_mes'],
+                    'fato_demanda_faturada': fato['demanda_faturada'],
+                    'fato_demanda_ultrapassada': fato['demanda_ultrapassada'],
+                    'fato_demanda_pt': fato['demanda_pt'],
+                    'fato_demanda_fp_cap': fato['demanda_fp_cap'],
+                    'fato_demanda_fp_ind': fato['demanda_fp_ind'],
+                    'fato_consumo_pt_vd': fato['consumo_pt_vd'],
+                    'fato_consumo_fp_cap_vd': fato['consumo_fp_cap_vd'],
+                    'fato_consumo_fp_ind_vd': fato['consumo_fp_ind_vd'],
+                    'fato_taxa_rev_fatura': fato['taxa_rev_fatura'],
+                    'fato_tarifas': fato['tarifas'],
+                    'fato_num_contrato': fato['num_contrato'],
+                    'fato_grupo': fato['grupo'],
+                    'fato_tipo_consumidor': fato['tipo_consumidor'],
+                    'fato_num_instalacao': fato['num_instalacao'],
+                    'fato_num_medidor': fato['num_medidor'],
+                    'fato_leitura_anterior': fato['leitura_anterior'],
+                    'fato_leitura_atual': fato['leitura_atual'],
+                    'fato_icms': fato['icms'],
+                    'fato_dmics': fato['dmics'],
+                    'fato_dicris': fato['dicris'],
+                    'fato_dics': fato['dics'],
+                    'fato_total': fato['total'],
+                    'fato_planta': fato['planta'],
+                    'fato_modalidade': fato['modalidade'],
+
+                    'endereco_id': endereco_cliente.get('id_endereco', None),
+                    'endereco_instalacao': endereco_cliente.get('endereco_instalacao', None),
+
+                    'fornecedor_id': fornecedor_cliente.get('id_fornecedor_energia', None),
+                    'fornecedor_nome': fornecedor_cliente.get('fornecedor', None),
+                    'fornecedor_num_contrato': fornecedor_cliente.get('num_contrato', None),
+                })
 
         return Response(combined_data)

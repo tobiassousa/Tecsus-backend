@@ -43,7 +43,10 @@ INSTALLED_APPS = [
     'energia',
     'alerta',
     'corsheaders',
+    'user_management',
 ]
+
+AUTH_USER_MODEL = 'user_management.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
