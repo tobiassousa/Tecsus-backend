@@ -9,7 +9,6 @@ WORKDIR /app
 # Temporariamente mudar para o usuário root
 USER root
 
-# Instale as dependências do sistema necessárias para o PostgreSQL
 RUN apt-get update && \
     apt-get install -y gcc libpq-dev && \
     apt-get clean
