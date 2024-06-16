@@ -37,6 +37,10 @@ jobs:
     needs: build
     runs-on: self-hosted
     steps:
+
+        - name: Remove Docker image for backend
+          run: sudo docker rmi datateam23/tecsus-backend
+        
         - name: Pull Docker image for backend
           run: sudo docker pull datateam23/tecsus-backend:latest
 
