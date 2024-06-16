@@ -6,7 +6,6 @@ ENV PYTHONUNBUFFERED 1
 
 WORKDIR /app
 
-# Temporariamente mudar para o usuário root
 USER root
 
 RUN apt-get update && \
