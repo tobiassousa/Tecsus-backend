@@ -36,8 +36,8 @@ jobs:
   deploy:
     needs: build
     runs-on: self-hosted
-    steps:
-        
+    steps:  
+
         - name: Pull Docker image for backend
           run: sudo docker pull datateam23/tecsus-backend:latest
 
@@ -54,4 +54,4 @@ jobs:
           run: sudo docker run --rm --name django-superuser --link postgres-db:db -e DATABASE_URL=${{secrets.DATABASE_URL}} datateam23/tecsus-backend python manage.py createsuperuser
   
         - name: Start Django backend application
-          run: sudo docker run -d --name tecsus-backend -p 8000:8000 --link postgres-db:db datateam23/tecsus-backend
+          run: sudo docker run -d --name tecsus-backend -p 80:80 --link postgres-db:db datateam23/tecsus-backend
