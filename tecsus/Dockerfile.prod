@@ -1,4 +1,4 @@
-FROM python:3.12
+FROM datateam23/tecsus-backend:latest
 
 ENV PYTHONDONTWRITEBYTECODE 1
 
@@ -6,16 +6,11 @@ ENV PYTHONUNBUFFERED 1
 
 WORKDIR /app
 
-# Instale as dependências do sistema necessárias para o PostgreSQL
+USER root
+
 RUN apt-get update && \
     apt-get install -y gcc libpq-dev && \
     apt-get clean
-
-# Adicione um novo grupo não privilegiado para utilizar no teste de integração
-RUN addgroup nonroot
-
-# Adicione um novo usuário não privilegiados
-RUN useradd --no-log-init -r -g nonroot nonroot
 
 # Copie o arquivo de requisitos e instale as dependências do Python
 COPY requirements.txt /app/
