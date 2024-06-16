@@ -58,6 +58,11 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8080',
+    'http://54.234.110.111',
+    'https://54.234.110.111',
+    'http://ec2-54-234-110-111.compute-1.amazonaws.com',
+    'https://ec2-54-234-110-111.compute-1.amazonaws.com'
+    
 ]
 
 ALLOWED_HOSTS = ['*']
