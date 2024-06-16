@@ -58,7 +58,11 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8080',
+    '*'
 ]
+
+ALLOWED_HOSTS = ['*']
+
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
