@@ -9,6 +9,7 @@ from django.core.files.storage import default_storage
 from rest_framework import generics
 from .serializers import FornecedorAguaSerializer, EnderecoSerializer, ClienteContratoSerializer, FatoContratoAguaSerializer
 from .utils import comparar_media_mes_atual_com_ultimos_tres_meses
+from django.db.models import Case, When, Value, BooleanField
 from django.db import connection
 
 
@@ -24,7 +25,7 @@ class FornecedorAguaAPIView(generics.ListAPIView):
             except FornecedorAgua.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
         else:
-            fornecedores = FornecedorAgua.objects.all()
+            fornecedores = FornecedorAgua.objects.order_by('fornecedor').distinct('fornecedor')
             serializer = FornecedorAguaSerializer(fornecedores, many=True)
             return Response(serializer.data)
     
@@ -58,6 +59,7 @@ class EnderecoAPIView(generics.ListAPIView):
     serializer_class = EnderecoSerializer
 
 
+
 class ClienteContratoAPIView(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         codigo_de_ligacao_rgi = self.kwargs.get('codigo_de_ligacao_rgi')
@@ -70,7 +72,13 @@ class ClienteContratoAPIView(generics.ListAPIView):
             except ClienteContrato.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
         else:
-            clientes = ClienteContrato.objects.all()
+            clientes = ClienteContrato.objects.annotate(
+                has_contrato=Case(
+                    When(numero_contrato__isnull=True, then=Value(True)),
+                    default=Value(False),
+                    output_field=BooleanField()
+                )
+            ).order_by('has_contrato')
             serializer = ClienteContratoSerializer(clientes, many=True)
             return Response(serializer.data)
     
@@ -171,7 +179,8 @@ class InserirDadosAPIView(APIView):
 
                 endereco, _ = Endereco.objects.get_or_create(
                     endereco_instalacao=linha['Endereço de Instalação'],
-                    cidade=linha['Nome do Contrato']
+                    cidade=linha['Nome do Contrato'],
+                    codigo_de_ligacao_rgi=codigo_de_ligacao_rgi
                 )
 
                 contrato, _ = ClienteContrato.objects.get_or_create(
@@ -254,22 +263,40 @@ class AllDataAPIView(APIView):
         contratos_data = ClienteContratoSerializer(contratos, many=True).data
         fatos_contrato_data = FatoContratoAguaSerializer(fatos_contrato, many=True).data
 
-        combined_data = {}
-        for contrato_data in contratos_data:
-            codigo_de_ligacao_rgi = contrato_data['codigo_de_ligacao_rgi']
-            fornecedor_data = [f for f in fornecedores_data if f['codigo_de_ligacao_rgi'] == codigo_de_ligacao_rgi]
-            fato_contrato_data = [f for f in fatos_contrato_data if f['codigo_de_ligacao_rgi'] == codigo_de_ligacao_rgi]
+        combined_data = []
+        for contrato in contratos_data:
+            codigo_de_ligacao_rgi = contrato['codigo_de_ligacao_rgi']
+            fatos_contrato_cliente = [fato for fato in fatos_contrato_data if fato['codigo_de_ligacao_rgi'] == codigo_de_ligacao_rgi]
+            fornecedor_cliente = next((fornecedor for fornecedor in fornecedores_data if fornecedor['codigo_de_ligacao_rgi'] == codigo_de_ligacao_rgi), {})
+            endereco_cliente = next((endereco for endereco in enderecos_data if endereco['codigo_de_ligacao_rgi'] == codigo_de_ligacao_rgi), {})
 
-            endereco_data = None
-            if fato_contrato_data and 'id_endereco' in fato_contrato_data[0]:
-                endereco_id = fato_contrato_data[0]['id_endereco']
-                endereco_data = [e for e in enderecos_data if e['id_endereco'] == endereco_id]
+            for fato in fatos_contrato_cliente:
+                combined_data.append({
+                    'contrato_nome': contrato['nome_contrato'],
+                    'contrato_email': contrato['email'],
+                    'contrato_ativo': contrato['ativo'],
+                    'contrato_numero_contrato': contrato['numero_contrato'],
+                    'contrato_numero_cliente': contrato['numero_cliente'],
+                    'contrato_codigo_de_ligacao_rgi': contrato['codigo_de_ligacao_rgi'],
 
-            combined_data[codigo_de_ligacao_rgi] = {
-                'contrato': contrato_data,
-                'fornecedor': fornecedor_data[0] if fornecedor_data else None,
-                'endereco': endereco_data[0] if endereco_data else None,
-                'fato_contrato': fato_contrato_data[0] if fato_contrato_data else None
-            }
+                    'fato_id': fato['id_contrato_agua'],
+                    'fato_consumo_agua_m3': fato['consumo_agua_m3'],
+                    'fato_consumo_esgoto_m3': fato['consumo_esgoto_m3'],
+                    'fato_vlr_agua': fato['vlr_agua'],
+                    'fato_vlr_esgoto': fato['vlr_esgoto'],
+                    'fato_vlr_total': fato['vlr_total'],
+                    'fato_leitura_anterior': fato['leitura_anterior'],
+                    'fato_leitura_atual': fato['leitura_atual'],
+
+                    'endereco_id': endereco_cliente.get('id_endereco', None),
+                    'endereco_instalacao': endereco_cliente.get('endereco_instalacao', None),
+                    'endereco_cidade': endereco_cliente.get('cidade', None),
+
+                    'fornecedor_id': fornecedor_cliente.get('id_fornecedor_agua', None),
+                    'fornecedor_nome': fornecedor_cliente.get('fornecedor', None),
+                    'fornecedor_cod_companhia': fornecedor_cliente.get('cod_companhia', None),
+                    'fornecedor_planta': fornecedor_cliente.get('planta', None),
+                    'fornecedor_codigo_de_ligacao_rgi': fornecedor_cliente.get('codigo_de_ligacao_rgi', None),
+                })
 
         return Response(combined_data)
