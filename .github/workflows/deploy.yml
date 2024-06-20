@@ -1,11 +1,9 @@
 name: Deploy Tecsus
 
 on:
-  pull_request:
+  push:
     branches:
-      - main
-    types:
-      - closed
+      - XP-36-integracao
 
 jobs:
   build:
@@ -36,15 +34,27 @@ jobs:
        
        
   deploy:
-          needs: build
-          runs-on: self-hosted
-          steps:
-              - name: Pull image from docker hub
-                run: sudo docker pull datateam23/tecsus-backend:latest
-              - name: Remove docker container
-                run: sudo docker rm -f tecsus-backend
-              - name: Run docker container
-                run: sudo docker run -d -p 8000:8000 -e DATABASE_USERNAME=${{secrets.DATABASE_USER}} -e DATABASE_PASSWORD='${{secrets.DATABASE_PASSWORD}}' -e DATABASE_URL=${{secrets.DATABASE_URL}} --name tecsus-backend  datateam23/tecsus-backend
+    needs: build
+    runs-on: self-hosted
+    steps:  
+
+      - name: Pull Docker image for backend
+        run: sudo docker pull datateam23/tecsus-backend:latest
+
+      - name: Run Database
+        run: sudo docker run -d --name postgres-db -e POSTGRES_DB=${{secrets.DATABASE_NAME}} -e POSTGRES_USER=${{secrets.DATABASE_user}} -e POSTGRES_PASSWORD=${{secrets.DATABASE_PASSWORD}} -v postgres_data:/var/lib/postgresql/data postgres:latest
+
+      - name: Run Django makemigrations
+        run: sudo docker run --rm --name django-makemigrations --link postgres-db:db -e DATABASE_URL=${{secrets.DATABASE_URL}} datateam23/tecsus-backend python manage.py makemigrations
+
+      - name: Run Django migrations
+        run: sudo docker run --rm --name django-migrate --link postgres-db:db -e DATABASE_URL=${{secrets.DATABASE_URL}} datateam23/tecsus-backend python manage.py migrate
+
+      - name: Create Django superuser
+        run: sudo docker run --rm --name django-superuser --link postgres-db:db -e DATABASE_URL=${{secrets.DATABASE_URL}} datateam23/tecsus-backend python manage.py createsuperuser
+
+      - name: Start Django backend application
+        run: sudo docker run -d --name tecsus-backend -p 80:80 --link postgres-db:db datateam23/tecsus-backend
 
 
               
