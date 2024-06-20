@@ -73,3 +73,6 @@ jobs:
 
       - name: Start Django backend application
         run: sudo docker run -d --name tecsus-backend -p 80:80 --link postgres-db:db datateam23/tecsus-backend
+
+
+        
