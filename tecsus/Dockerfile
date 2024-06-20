@@ -6,7 +6,7 @@ ENV PYTHONUNBUFFERED 1
 
 WORKDIR /app
 
-# Instale as dependências do sistema necessárias para o PostgreSQL
+# Instale as dependências do sistema necessárias
 RUN apt-get update && \
     apt-get install -y gcc libpq-dev && \
     apt-get clean
