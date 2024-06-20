@@ -37,7 +37,24 @@ jobs:
     needs: build
     runs-on: self-hosted
     steps:  
+    
+      - name: Stop Backend container
+        run: sudo docker stop tecsus-backend
 
+      - name: Remove Backend container
+        run: sudo docker rm tecsus-backend
+
+      - name: Remove Backend image
+        run: sudo docker rmi datateam23/tecsus-backend:latest
+
+      - name: Stop Database container
+        run: sudo docker stop postgres-db
+
+      - name: Remove Database container
+        run: sudo docker rm postgres-db
+
+      - name: Remove Database image
+        run: sudo docker rmi postgres:latest
 
       - name: Pull Docker image for backend
         run: sudo docker pull datateam23/tecsus-backend:latest
