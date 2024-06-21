@@ -1,0 +1,34 @@
+name: Load Test Pipeline
+
+on:
+  push: 
+    branches: [xp-49-deploy-banco]
+
+jobs:
+  build-unit-tests:
+    name: Load Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10.5
+
+      - name: Run start-install.bat
+        run: . start-install.bat
+        working-directory: tecsus
+
+      - name: Run start.bat
+        run: . start.bat
+        working-directory: tecsus
+
+      - name: Run docker exec
+        run: docker exec -it tecsus-db-1 bash
+        working-directory: tecsus
+        
+      - name: Run Load Test
+        run: psql -U tecsus -d tecsus -f /docker-entrypoint-initdb.d/v1/initial_load.sql
