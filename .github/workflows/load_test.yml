@@ -19,11 +19,13 @@ jobs:
           python-version: 3.10.5
 
       - name: Run start-install.bat
-        run: . start-install.bat
+        run: |
+            ./start-install.bat
         working-directory: tecsus
 
       - name: Run start.bat
-        run: . start.bat
+        run: |
+            ./start.bat
         working-directory: tecsus
 
       - name: Run docker exec
