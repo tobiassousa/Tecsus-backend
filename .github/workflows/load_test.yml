@@ -17,6 +17,9 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: 3.10.5
+  
+      - name: permissões start-install.bat
+        run: chmod +x ./start-install.bat
 
       - name: Run start-install.bat
         run: |
