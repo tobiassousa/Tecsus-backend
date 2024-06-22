@@ -35,7 +35,13 @@ jobs:
         working-directory: tecsus      
         
       - name: Wait for start.bat to complete
-        run: sleep 30 
+        run: |
+          while [ ! -f tecsus/completion.txt ]; do
+            sleep 1
+          done
+
+      - name: Remove completion file
+        run: rm tecsus/completion.txt
         
       - name: Run docker exec
         run: docker exec -it tecsus-db-1 bash
