@@ -18,6 +18,9 @@ jobs:
         with:
           python-version: 3.10.5
 
+      - name: permissões start-install.bat
+        run: chmod +x ./tecsus/start-install.bat 
+
       - name: Run start-install.bat
         run: |
             ./start-install.bat
