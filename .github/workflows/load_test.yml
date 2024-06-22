@@ -20,7 +20,7 @@ jobs:
 
       - name: Run start-install.bat
         run: |
-            ./start-install.bat
+            start-install.bat
         working-directory: tecsus
         shell: cmd
 
