@@ -26,6 +26,17 @@ jobs:
             ./start-install.bat
         working-directory: tecsus
 
+      - name: permissões start.bat
+        run: chmod +x ./tecsus/start.bat 
+
+      - name: Run start.bat
+        run: |
+            ./start.bat
+        working-directory: tecsus      
+        
+      - name: Wait for start.bat to complete
+        run: sleep 30 
+        
       - name: Run docker exec
         run: docker exec -it tecsus-db-1 bash
         working-directory: tecsus
