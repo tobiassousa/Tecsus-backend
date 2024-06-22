@@ -26,6 +26,9 @@ jobs:
             ./start-install.bat
         working-directory: tecsus
 
+      - name: permissões start.bat
+        run: chmod +x ./tecsus/start.bat
+
       - name: Run start.bat
         run: |
             ./start.bat
